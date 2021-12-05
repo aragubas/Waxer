@@ -56,7 +56,8 @@ namespace Waxer
                     tiles.Add(tile);
                 }
             }
-    
+            camera.ScreenLimit = new Vector2(32 * 32, 32 * 32);
+             
             player = new PlayerEntity();
         }
    
@@ -78,14 +79,8 @@ namespace Waxer
                     IterationCount++;
                     tile.Draw(spriteBatch);
                 }
-                Rectangle col = new Rectangle((int)(tile.ScreenPosition.X + camera.GetMatrix().Translation.X), (int)(tile.ScreenPosition.Y + camera.GetMatrix().Translation.Y), 32, 32);
-                
-                if (col.Intersects(MouseInput.Position))
-                { 
-                    spriteBatch.DrawString(debugFont, $"x: {tile.ScreenPosition.X}\ny: {tile.ScreenPosition.Y}", tile.ScreenPosition, Color.Red);
-                }
             }
-  
+
             spriteBatch.End();
             
             spriteBatch.Begin();
@@ -93,7 +88,6 @@ namespace Waxer
             spriteBatch.DrawString(debugFont, $"IterationCount {IterationCount}", new Vector2(0, 50), Color.Red);
 
             spriteBatch.End();
-
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -110,7 +104,7 @@ namespace Waxer
             
             spriteBatch.Begin();
             
-            spriteBatch.DrawString(debugFont, $"x: {camera.CameraPosition.X}\ny: {camera.CameraPosition.X}", Vector2.Zero, Color.Red);
+            spriteBatch.DrawString(debugFont, $"x: {camera.CameraPosition.X}\ny: {camera.CameraPosition.Y}", Vector2.Zero, Color.Red);
             
             spriteBatch.End();
 
