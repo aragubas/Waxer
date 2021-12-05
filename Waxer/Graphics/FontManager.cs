@@ -24,7 +24,7 @@ namespace Waxer.Graphics
         public static SpriteFont BakeFont(string FontName, float FontSize, GraphicsDevice graphDev)
         {
             Utils.ConsoleWriteWithTitle("Fonts.BakeFont", $"Baker Font '{FontName}' with Size '{FontSize.ToString()}'", true);
-            TtfFontBakerResult fontBakeResult = TtfFontBaker.Bake(File.ReadAllBytes($"{Settings.FontsPath}{Settings.FontsPath}{FontName}.ttf"),
+            TtfFontBakerResult fontBakeResult = TtfFontBaker.Bake(File.ReadAllBytes($"{Settings.FontsPath}{FontName}.ttf"),
                 FontSize,
                 1024,
                 1024,

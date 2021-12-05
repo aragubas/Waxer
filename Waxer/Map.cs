@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using Waxer.GameLogic;
 
 namespace Waxer
 {
@@ -12,15 +13,20 @@ namespace Waxer
 
     public class MapTile
     {
-        public Vector2 MapPosition;
+        public Vector2 ScreenPosition;
+        public Vector2 TilePosition;
         public Texture2D TileTexture;
         
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(TileTexture, MapPosition, Color.White);
+            spriteBatch.Draw(TileTexture, ScreenPosition, Color.White);
         }
 
+        public Rectangle GetScreenPosition(Camera2D camera)
+        {
+            return new Rectangle((int)(ScreenPosition.X), (int)(ScreenPosition.Y), 32, 32);
+        }
     }
 
 
@@ -28,6 +34,9 @@ namespace Waxer
     {
         MapProperties properties;
         List<MapTile> tiles = new List<MapTile>();
+        PlayerEntity player;
+        Camera2D camera = new Camera2D();
+        SpriteFont debugFont;
 
         public Map()
         {
@@ -37,28 +46,82 @@ namespace Waxer
             Texture2D grassTile = Graphics.Sprites.GetSprite("/tiles/1.png");
 
             for(int x = 0; x < 32; x++)
-            {
+            { 
                 for(int y = 0; y < 32; y++)
                 {
                     MapTile tile = new MapTile();
                     tile.TileTexture = grassTile;
-                    tile.MapPosition = new Vector2(x * properties.TileSize.X, y * properties.TileSize.Y);
+                    tile.TilePosition = new Vector2(x, y);
+                    tile.ScreenPosition = new Vector2(x * properties.TileSize.X, y * properties.TileSize.Y);
                     tiles.Add(tile);
                 }
             }
+    
+            player = new PlayerEntity();
         }
-
-
-        public void Draw(SpriteBatch spriteBatch)
+   
+        // Draw the map on its batch
+        void DrawMap(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin();
-            
+            if (debugFont == null) 
+            {
+                debugFont = Graphics.Fonts.GetSpriteFont(Graphics.Fonts.GetFontDescriptor("/PressStart2P", 8, spriteBatch.GraphicsDevice));
+            }
+
+            spriteBatch.Begin(transformMatrix: camera.GetMatrix());
+            int IterationCount = 0;
+
             foreach(MapTile tile in tiles)
             {
-                tile.Draw(spriteBatch);
+                if (camera.IsOnScreen(tile.GetScreenPosition(camera)))
+                {
+                    IterationCount++;
+                    tile.Draw(spriteBatch);
+                }
+                Rectangle col = new Rectangle((int)(tile.ScreenPosition.X + camera.GetMatrix().Translation.X), (int)(tile.ScreenPosition.Y + camera.GetMatrix().Translation.Y), 32, 32);
+                
+                if (col.Intersects(MouseInput.Position))
+                { 
+                    spriteBatch.DrawString(debugFont, $"x: {tile.ScreenPosition.X}\ny: {tile.ScreenPosition.Y}", tile.ScreenPosition, Color.Red);
+                }
             }
   
             spriteBatch.End();
+            
+            spriteBatch.Begin();
+            
+            spriteBatch.DrawString(debugFont, $"IterationCount {IterationCount}", new Vector2(0, 50), Color.Red);
+
+            spriteBatch.End();
+
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            DrawMap(spriteBatch);
+ 
+            spriteBatch.Begin(transformMatrix: camera.GetMatrix());
+
+            player.Draw(spriteBatch);
+
+            spriteBatch.End();
+  
+            camera.CenterTo(new Vector2(player.Position.X + player.Texture.Width / 2, player.Position.Y + player.Texture.Height / 2), spriteBatch.GraphicsDevice.Viewport);
+            
+            spriteBatch.Begin();
+            
+            spriteBatch.DrawString(debugFont, $"x: {camera.CameraPosition.X}\ny: {camera.CameraPosition.X}", Vector2.Zero, Color.Red);
+            
+            spriteBatch.End();
+
+        } 
+  
+        public void Update()
+        {
+            camera.Update();
+              
+            player.Update();
+
         }
 
     }

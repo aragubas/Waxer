@@ -34,6 +34,8 @@ namespace Waxer
         {
             base.Update(gameTime);
             MouseInput.Update();
+  
+            gameMap.Update();
         }
 
         protected override void Draw(GameTime gameTime)
