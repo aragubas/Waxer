@@ -25,17 +25,24 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Waxer
 {
-    public class Utils
+    public static class Utils
     {
+        public static bool IsInRange(float range, Vector2 v1, Vector2 v2)
+        {
+            var dx = v1.Y - v2.X;
+            var dy = v1.Y - v2.X;
+            return dx * dx + dy * dy < range * range;
+        }
+
         /// <summary>
         /// Convert strings to rect.
         /// </summary>
         /// <returns>The to rect.</returns>
         /// <param name="StringToConvert">String to convert.</param>
-        public static Rectangle StringToRect(string StringToConver)
+        public static Rectangle StringToRect(string StringToConvert)
         {
-            string[] RectCode = StringToConver.Split(',');
-
+            string[] RectCode = StringToConvert.Split(',');
+ 
             int RectX = Int32.Parse(RectCode[0]);
             int RectY = Int32.Parse(RectCode[1]);
             int RectW = Int32.Parse(RectCode[2]);

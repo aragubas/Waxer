@@ -10,7 +10,6 @@ namespace Waxer
         public Vector2 TileSize;
     }
 
-
     public class MapTile
     {
         public Vector2 ScreenPosition;
@@ -32,10 +31,12 @@ namespace Waxer
 
     public class Map
     {
-        MapProperties properties;
-        List<MapTile> tiles = new List<MapTile>();
-        PlayerEntity player;
-        Camera2D camera = new Camera2D();
+        public MapProperties properties;
+        public List<MapTile> tiles = new List<MapTile>();
+        public PlayerEntity player;
+        public Camera2D camera = new Camera2D();
+        public List<MapEntity> Entities = new List<MapEntity>();
+        public Dictionary<MapEntity, List<MapEntity>> ColidingEntities = new Dictionary<MapEntity, List<MapEntity>>();
         SpriteFont debugFont;
 
         public Map()
@@ -58,7 +59,9 @@ namespace Waxer
             }
             camera.ScreenLimit = new Vector2(32 * 32, 32 * 32);
              
-            player = new PlayerEntity();
+            player = new PlayerEntity(new Vector2(64, 64), this);
+            Entities.Add(new GameLogic.Towers.Test(new Vector2(32, 32), this));
+            
         }
    
         // Draw the map on its batch
@@ -90,10 +93,34 @@ namespace Waxer
             spriteBatch.End();
         }
 
+        public void DrawEntities(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Begin(transformMatrix: camera.GetMatrix());
+
+            for(int i = 0; i < Entities.Count; i++)
+            {
+                Entities[i].Draw(spriteBatch);
+            }
+
+            spriteBatch.End();
+        }
+
+        public void UpdateEntities()
+        {
+            for(int i = 0; i < Entities.Count; i++)
+            {
+                Entities[i].UpdateScreenPosition(camera);
+                Entities[i].Update();
+            }
+ 
+ 
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             DrawMap(spriteBatch);
- 
+            DrawEntities(spriteBatch);
+
             spriteBatch.Begin(transformMatrix: camera.GetMatrix());
 
             player.Draw(spriteBatch);
@@ -105,7 +132,7 @@ namespace Waxer
             spriteBatch.Begin();
             
             spriteBatch.DrawString(debugFont, $"x: {camera.CameraPosition.X}\ny: {camera.CameraPosition.Y}", Vector2.Zero, Color.Red);
-            
+        
             spriteBatch.End();
 
         } 
@@ -113,8 +140,10 @@ namespace Waxer
         public void Update()
         {
             camera.Update();
-              
-            player.Update();
+            
+            player.Update();    
+            
+            UpdateEntities();
 
         }
 

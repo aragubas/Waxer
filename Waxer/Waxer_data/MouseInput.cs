@@ -6,6 +6,7 @@ namespace Waxer
     public static class MouseInput
     {
         public static Rectangle Position;
+        public static Vector2 PositionVector2;
         public static Rectangle Left_UpClickPos;
         public static Rectangle Left_DownClickPos;
         public static Rectangle Right_UpClickPos;
@@ -18,10 +19,11 @@ namespace Waxer
             Left_DownClickPos = Rectangle.Empty;
             Right_UpClickPos = Rectangle.Empty;
             Right_DownClickPos = Rectangle.Empty;
-             
+            
             MouseState newState = Mouse.GetState();
             Position = new Rectangle(newState.Position.X, newState.Position.Y, 1, 1);
-
+            PositionVector2 = newState.Position.ToVector2();
+             
             // Check for Left Button Up
             if (newState.LeftButton == ButtonState.Pressed && oldState.LeftButton == ButtonState.Released)
             {
