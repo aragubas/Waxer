@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Waxer.GameLogic;
+using System;
 
 namespace Waxer
 {
@@ -10,56 +11,68 @@ namespace Waxer
         public Vector2 TileSize;
     }
 
-    public class MapTile
+    public struct EnvironmentSettings
     {
-        public Vector2 ScreenPosition;
-        public Vector2 TilePosition;
-        public Texture2D TileTexture;
-        
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Draw(TileTexture, ScreenPosition, Color.White);
-        }
-
-        public Rectangle GetScreenPosition(Camera2D camera)
-        {
-            return new Rectangle((int)(ScreenPosition.X), (int)(ScreenPosition.Y), 32, 32);
-        }
+        public float Gravity = 28f;
+        public Vector2 WorldSize = Vector2.Zero;
     }
-
 
     public class Map
     {
         public MapProperties properties;
-        public List<MapTile> tiles = new List<MapTile>();
+        public Dictionary<Point, MapTile> tiles = new();
         public PlayerEntity player;
         public Camera2D camera = new Camera2D();
         public List<MapEntity> Entities = new List<MapEntity>();
-        public Dictionary<MapEntity, List<MapEntity>> ColidingEntities = new Dictionary<MapEntity, List<MapEntity>>();
-        SpriteFont debugFont;
+        public EnvironmentSettings MapEnvironment = new EnvironmentSettings();
+        public SpriteFont DebugFont;
+
 
         public Map()
         {
             properties = new MapProperties();
             properties.TileSize = new Vector2(32, 32);
             
-            Texture2D grassTile = Graphics.Sprites.GetSprite("/tiles/1.png");
-
+            // Fill with air tiles
             for(int x = 0; x < 32; x++)
             { 
                 for(int y = 0; y < 32; y++)
                 {
                     MapTile tile = new MapTile();
-                    tile.TileTexture = grassTile;
                     tile.TilePosition = new Vector2(x, y);
                     tile.ScreenPosition = new Vector2(x * properties.TileSize.X, y * properties.TileSize.Y);
-                    tiles.Add(tile);
+                    tiles.Add(new Point(x, y), tile);
                 }
             }
+            // Set the camera limit to the map
             camera.ScreenLimit = new Vector2(32 * 32, 32 * 32);
+            
+            for (int x = 0; x < 32; x++)
+            {
+                for (int y = 20; y < 32; y++)
+                {
+                    tiles[new Point(x, y)].SetTileID(1);
+                    tiles[new Point(x, y)].IsColideable = true;
+                }
+            }
+
+            MapEnvironment.WorldSize = new Vector2(1024, 1024);
              
-            player = new PlayerEntity(new Vector2(64, 64), this);
+            // Just for testing colision          
+            tiles[new Point(1, 19)].SetTileID(1);
+            tiles[new Point(1, 19)].IsColideable = true;
+            
+            tiles[new Point(1, 18)].SetTileID(1);
+            tiles[new Point(1, 18)].IsColideable = true;
+
+            tiles[new Point(2, 19)].SetTileID(1);
+            tiles[new Point(2, 19)].IsColideable = true;
+
+            tiles[new Point(8, 19)].SetTileID(1);
+            tiles[new Point(8, 19)].IsColideable = true;
+            
+
+            player = new PlayerEntity(new Vector2(5 * 32, 12 * 32), this);
             Entities.Add(new GameLogic.Towers.Test(new Vector2(32, 32), this));
             
         }
@@ -67,19 +80,19 @@ namespace Waxer
         // Draw the map on its batch
         void DrawMap(SpriteBatch spriteBatch)
         {
-            if (debugFont == null) 
+            if (DebugFont == null) 
             {
-                debugFont = Graphics.Fonts.GetSpriteFont(Graphics.Fonts.GetFontDescriptor("/PressStart2P", 8, spriteBatch.GraphicsDevice));
+                DebugFont = Graphics.Fonts.GetSpriteFont(Graphics.Fonts.GetFontDescriptor("/PressStart2P", 8, spriteBatch.GraphicsDevice));
             }
 
             spriteBatch.Begin(transformMatrix: camera.GetMatrix());
-            int IterationCount = 0;
-
-            foreach(MapTile tile in tiles)
+            int i = 0;
+ 
+            foreach(MapTile tile in tiles.Values)
             {
-                if (camera.IsOnScreen(tile.GetScreenPosition(camera)))
+                if (camera.IsOnScreen(tile.GetScreenPosition()))
                 {
-                    IterationCount++;
+                    i++;
                     tile.Draw(spriteBatch);
                 }
             }
@@ -88,7 +101,7 @@ namespace Waxer
             
             spriteBatch.Begin();
             
-            spriteBatch.DrawString(debugFont, $"IterationCount {IterationCount}", new Vector2(0, 50), Color.Red);
+            spriteBatch.DrawString(DebugFont, $"Tiles on Screen: {i}", new Vector2(0, 25), Color.Red);
 
             spriteBatch.End();
         }
@@ -101,49 +114,75 @@ namespace Waxer
             {
                 Entities[i].Draw(spriteBatch);
             }
+            
+            player.Draw(spriteBatch);
 
             spriteBatch.End();
         }
 
-        public void UpdateEntities()
+        public void UpdateEntities(GameTime gameTime)
         {
             for(int i = 0; i < Entities.Count; i++)
             {
                 Entities[i].UpdateScreenPosition(camera);
-                Entities[i].Update();
+                Entities[i].Update(gameTime);
             }
  
  
         }
 
+        public Vector2 GetTilePosition(Vector2 pos)
+        {
+            int xPos = 0;
+            int yPos = 0;
+
+            xPos = (int)pos.X / (int)properties.TileSize.X;
+            yPos = (int)pos.Y / (int)properties.TileSize.Y;
+   
+            return new Vector2(xPos, yPos);
+        }
+
+        public Vector2 GetTilePosition(Rectangle rect)
+        {
+            int xPos = 0;
+            int yPos = 0;
+
+            xPos = rect.X / (int)properties.TileSize.X;
+            yPos = rect.Y / (int)properties.TileSize.Y;
+   
+            return new Vector2(xPos, yPos);
+        }
+
+
+        public MapTile GetTile(Vector2 pos)
+        {
+            try
+            {
+                return tiles[pos.ToPoint()];
+
+            } catch (System.Collections.Generic.KeyNotFoundException)
+            {
+                return null;
+            }
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
+            // Center the camera to the center of the player
+            camera.CenterTo(new Vector2(player.Position.X + player.Texture.Width / 2, player.Position.Y + player.Texture.Height / 2), spriteBatch.GraphicsDevice.Viewport);
+
             DrawMap(spriteBatch);
             DrawEntities(spriteBatch);
-
-            spriteBatch.Begin(transformMatrix: camera.GetMatrix());
-
-            player.Draw(spriteBatch);
-
-            spriteBatch.End();
   
-            camera.CenterTo(new Vector2(player.Position.X + player.Texture.Width / 2, player.Position.Y + player.Texture.Height / 2), spriteBatch.GraphicsDevice.Viewport);
-            
-            spriteBatch.Begin();
-            
-            spriteBatch.DrawString(debugFont, $"x: {camera.CameraPosition.X}\ny: {camera.CameraPosition.Y}", Vector2.Zero, Color.Red);
-        
-            spriteBatch.End();
-
         } 
-  
-        public void Update()
+
+        public void Update(GameTime gameTime)
         {
             camera.Update();
             
-            player.Update();    
+            player.Update(gameTime);    
             
-            UpdateEntities();
+            UpdateEntities(gameTime);
 
         }
 

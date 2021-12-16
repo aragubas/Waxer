@@ -7,13 +7,13 @@ namespace Waxer.GameLogic
 {
     public class Bullet : MapEntity
     {
-        int _timer = 0;
-        public int Timespan = 120;
+        float Timer = 0;
+        public int Timespan = 3;
         public Vector2 Direction;
-        public float Speed = 8;
-        public bool ShootingMode;
+        public float Speed = 128f;
         public int Damage = 1;
         public string ShooterInstanceID;
+        MapTile TileUnder = null; 
 
         public Bullet(Vector2 initialPosition, Map parentMap, string ShooterInstanceID)
         {
@@ -25,23 +25,39 @@ namespace Waxer.GameLogic
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Texture, Position, Texture.Bounds, BlendColor, (float)Math.Atan2(Direction.Y, Direction.X), new Vector2(Texture.Width / 2, Texture.Height / 2), Vector2.One, SpriteEffects.None, 1f);
+            spriteBatch.Draw(Texture, Position, Texture.Bounds, BlendColor, (float)Math.Atan2(Direction.Y, Direction.X), Vector2.Zero, Vector2.One, SpriteEffects.None, 1f);
             spriteBatch.DrawRectangle(Area, Color.Green);
         }
 
-        public override void Update()
+        public override void Update(GameTime gameTime)
         {
-            _timer++;
-            if (_timer > Timespan) { ParentMap.Entities.Remove(this); return; }
-            BlendColor.A--;
+            Timer += 1 * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (Timer >= Timespan) { ParentMap.Entities.Remove(this); return; }
             
-            Position += Direction * Speed;
+            Position += Direction * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             Area = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
             if (Area.Intersects(ParentMap.player.Area))
             {
-                Console.WriteLine("Sinas");
                 ParentMap.player.BulletDamage(this);
+                Dispose();
+                return;
+            }
+
+
+            try
+            {
+                TileUnder = ParentMap.GetTile(ParentMap.GetTilePosition(Position));
+
+                if (TileUnder.IsColideable)
+                { 
+                    Dispose();
+                }
+                
+            } catch(System.Collections.Generic.KeyNotFoundException)
+            {
+                TileUnder = null;
+                Dispose();
             }
 
              

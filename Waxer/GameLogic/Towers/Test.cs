@@ -5,17 +5,19 @@ using MonoGame.Extended;
 namespace Waxer.GameLogic.Towers
 {
     public class Test : TowerBase
-    {
-        int _shootDelay = 0;
-        public int ShootingDelay = 15;
-        
+    { 
+        float ShootDelay = 0;
+        public int ShootingDelaySeconds = 3;
+        float GravityMultiplier;
+        bool CanShoot = false;
+
         public Test(Vector2 InitialPosition, Map parentMap)
         {
             Position = InitialPosition;
             Texture = Graphics.Sprites.GetSprite("/towers/test.png");
             ParentMap = parentMap;
         }
-
+ 
         private void Shoot()
         {
             Bullet newBullet = new Bullet(new Vector2(Position.X + 16, Position.Y + 16), ParentMap, InstanceID);
@@ -25,18 +27,44 @@ namespace Waxer.GameLogic.Towers
             ParentMap.Entities.Add(newBullet);
         }
 
-        public override void Update()
+        public override void Update(GameTime gameTime)
         {
-            base.Update();            
-            _shootDelay--;
-            if (_shootDelay < 0) { _shootDelay = 0; }
+            base.Update(gameTime);            
+            ShootDelay -= 1 * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (ShootDelay < 0) 
+            { 
+                ShootDelay = ShootingDelaySeconds; 
+                CanShoot = true;
+            }
 
             float Distance = Vector2.Distance(new Vector2(Position.X + 16, Position.Y - 16), new Vector2(ParentMap.player.Position.X + 16, ParentMap.player.Position.Y + 16));
-            if (Distance <= 300 && _shootDelay <= 0)
+            if (Distance <= 300 && CanShoot)
             {
-                _shootDelay = ShootingDelay;
+                CanShoot = false;
                 Shoot();
             }
+
+            try
+            {
+                MapTile tileUnder = ParentMap.GetTile(ParentMap.GetTilePosition(Position) - -Vector2.UnitY);
+                
+                if (!tileUnder.IsColideable)
+                {
+                    Position.Y += (ParentMap.MapEnvironment.Gravity * GravityMultiplier) * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                    GravityMultiplier += 16f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+
+                }else  // Player hits the ground
+                { 
+                    GravityMultiplier = 0f; 
+                }
+
+            }catch(System.Collections.Generic.KeyNotFoundException)
+            {
+                Position = Vector2.Zero;
+            }
+
         }
 
     }

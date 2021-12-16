@@ -49,17 +49,23 @@ namespace Waxer.Graphics
                 }
 
             }
-  
+
+            // Set the missing texture
+            MissingTexture = GetSprite("/missing_texture.png");
+
             Utils.ConsoleWriteWithTitle("SpriteLoader", "Operation Completed");
         }
 
 
         public static Texture2D GetSprite(string SpriteName)
         {
-            if (!SpriteName.EndsWith(".png")) { SpriteName.Insert(SpriteName.Length - 1, ".png"); }
-            if (!LoadedSprites.ContainsKey(SpriteName)) { return MissingTexture; }
+            string filtredSpriteName = SpriteName;
+
+            if (!SpriteName.EndsWith(".png")) { filtredSpriteName = filtredSpriteName.Insert(filtredSpriteName.Length - 1, ".png"); }
+            if (!SpriteName.StartsWith("/")) { filtredSpriteName = filtredSpriteName.Insert(0, "/"); }
+            if (!LoadedSprites.ContainsKey(filtredSpriteName)) { return MissingTexture; }
  
-            return LoadedSprites[SpriteName];
+            return LoadedSprites[filtredSpriteName];
         }
 
 

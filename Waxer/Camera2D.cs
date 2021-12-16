@@ -8,7 +8,6 @@ namespace Waxer
     {
         public Vector2 CameraPosition = Vector2.Zero;
         public float Smoothness = 0.6f;
-        Matrix transformMatrix ;
         Vector2 _animatedCameraPosition = Vector2.Zero;
         public Viewport viewport;
         public Vector2 ScreenLimit;

@@ -11,10 +11,19 @@ namespace Waxer
 		SpriteBatch spriteBatch;
         public CursorRenderer cursorRender;
         Map gameMap;
+        public static GameMain Reference;
 
 		public GameMain()
 		{
 			graphics = new GraphicsDeviceManager(this);
+
+            IsFixedTimeStep = false;
+            this.TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 15);
+
+            graphics.SynchronizeWithVerticalRetrace = false;
+            graphics.ApplyChanges();
+
+            Reference = this;
 		}
 
         protected override void Initialize()
@@ -22,26 +31,30 @@ namespace Waxer
 			if (!Directory.Exists(Settings.ContentFolder)) { throw new DirectoryNotFoundException("Cannot find data folder."); }
             
             spriteBatch = new SpriteBatch(GraphicsDevice);
- 
+
+            // Loads all game sprite into ram
             Graphics.Sprites.LoadAllSprites(GraphicsDevice);
 
-
+            // Creates a new cursor renderer
             cursorRender = new CursorRenderer();
+            
+            // Creates a new game map
             gameMap = new Map();
 		}
 
         protected override void Update(GameTime gameTime)
         {
-            base.Update(gameTime);
+            // Update mouse position
             MouseInput.Update();
-  
-            gameMap.Update();
+
+            gameMap.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            // Draw the game map
             gameMap.Draw(spriteBatch);
 
 			cursorRender.Draw(spriteBatch);

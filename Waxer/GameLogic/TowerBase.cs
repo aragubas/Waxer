@@ -6,7 +6,6 @@ namespace Waxer.GameLogic
     public abstract class TowerBase : MapEntity
     {
         public string TowerDisplayName;
-        public Rectangle Area;
         bool Grabbed;
         
 
@@ -28,7 +27,7 @@ namespace Waxer.GameLogic
             }
         }
 
-        public override void Update()
+        public override void Update(GameTime gameTime)
         {
             Area = new Rectangle((int)Position.X, (int)Position.Y, 32, 32);
             UpdateGrab();

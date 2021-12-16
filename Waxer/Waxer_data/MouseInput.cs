@@ -22,7 +22,16 @@ namespace Waxer
             
             MouseState newState = Mouse.GetState();
             Position = new Rectangle(newState.Position.X, newState.Position.Y, 1, 1);
-            PositionVector2 = newState.Position.ToVector2();
+            
+            // Limit the mouse position inside the window
+            if (Position.X <= 0) { Position.X = 0; }
+            if (Position.Y <= 0) { Position.Y = 0; }
+            if (Position.X >= GameMain.Reference.Window.ClientBounds.Width) { Position.X = GameMain.Reference.Window.ClientBounds.Width; }
+            if (Position.Y >= GameMain.Reference.Window.ClientBounds.Height) { Position.Y = GameMain.Reference.Window.ClientBounds.Height; }
+            
+            
+            PositionVector2 = new Vector2(Position.X, Position.Y);
+
              
             // Check for Left Button Up
             if (newState.LeftButton == ButtonState.Pressed && oldState.LeftButton == ButtonState.Released)
