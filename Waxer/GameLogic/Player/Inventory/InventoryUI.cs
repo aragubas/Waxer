@@ -8,6 +8,7 @@ namespace Waxer.GameLogic.Player.Inventory
         public override void Draw(SpriteBatch spriteBatch)
         {
             DrawBackground(spriteBatch);
+
         }
 
         public override void Update(float delta)

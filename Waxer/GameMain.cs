@@ -20,7 +20,6 @@ namespace Waxer
             IsFixedTimeStep = true;
             TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 60);
 
-
             graphics.SynchronizeWithVerticalRetrace = true;
             graphics.ApplyChanges();
 
