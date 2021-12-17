@@ -55,7 +55,7 @@ namespace Waxer
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             // Draw the game map
             gameMap.Draw(spriteBatch);

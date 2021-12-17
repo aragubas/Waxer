@@ -16,6 +16,10 @@ namespace Waxer
         public static string ImagePath = ContentFolder + "img\\";
         public static string SoundPath = ContentFolder + "sound\\";
         public static string DataPath = ContentFolder + "data\\";
+        
+        // Debug options
+        public static bool Debug_RenderColidersTiles = false;
+        public static bool Debug_RenderPlayerPositionPoints = false;
 
     }
 }

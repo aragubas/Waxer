@@ -3,8 +3,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
+using Waxer.GameLogic.Player.Inventory;
 
-namespace Waxer.GameLogic
+namespace Waxer.GameLogic.Player
 {
     public class PlayerEntity : MapEntity
     {
@@ -12,15 +13,14 @@ namespace Waxer.GameLogic
         public float MinimumSpeed = 64f;
         public float Acceleration = 1.8f;
         public float JumpMultiplier = 8f;
-        public int PlayerLife = 300;
+        public int Life = 300;
         KeyboardState oldState;
         Vector2 AimVector = Vector2.Zero;
         float GravityMultiplier = 0f;
         bool IsJumping = false;
         bool JumpAvailable = true;
         float JumpProgress = 0f;
-        MapTile TileUnderCursor = null;
-         
+        MapTile TileUnderCursor = null;         
         MapTile TileBehind = null;
         MapTile TileRight = null;
         MapTile TileLeft = null;
@@ -30,7 +30,9 @@ namespace Waxer.GameLogic
         MapTile TileTopRight = null;
         MapTile TileBottomLeft = null;
         MapTile TileBottomRight = null;
+        
         float LastDelta = 0.0f;
+        InventoryUI inventoryUI;
 
         public PlayerEntity(Vector2 initialPosition, Map parentMap)
         {
@@ -39,9 +41,13 @@ namespace Waxer.GameLogic
  
             // Set SpriteOrigin to Bottom Center
             SpriteOrigin = new Vector2(16, 0);
+
+            // Create the InventoryUI Element
+            inventoryUI = new InventoryUI();
         }
 
-        void RenderTileInfos(SpriteBatch spriteBatch, MapTile tile, string TileName)
+        // Used for Debugging
+        internal void RenderTileInfos(SpriteBatch spriteBatch, MapTile tile, string TileName)
         {
             Vector2 FixedPosition = new Vector2(((int)tile.TilePosition.X * 32) + (int)ParentMap.camera.CameraPosition.X, 
                 ((int)tile.TilePosition.Y * 32) + (int)ParentMap.camera.CameraPosition.Y);
@@ -63,71 +69,69 @@ namespace Waxer.GameLogic
             
             spriteBatch.End();
             spriteBatch.Begin();
-                        
-            if (TileBehind != null)
+            
+            if (Settings.Debug_RenderColidersTiles)
             {
-                RenderTileInfos(spriteBatch, TileBehind, "BEHI");
-            }
-                        
-            if (TileBottom != null)
-            {
-                RenderTileInfos(spriteBatch, TileBottom, "BOTT");
-            }
-                        
-            if (TileLeft != null)
-            {
-                RenderTileInfos(spriteBatch, TileLeft, "LEFT");
-            }
-                        
-            if (TileRight != null)
-            {
-                RenderTileInfos(spriteBatch, TileRight, "RIGH");
-            }
-                        
-            if (TileTop != null)
-            {
-                RenderTileInfos(spriteBatch, TileTop, "TOP");
-            }
-                        
-            if (TileTopLeft != null)
-            {
-                RenderTileInfos(spriteBatch, TileTopLeft, "TOPL");
-            }
-                        
-            if (TileTopRight != null)
-            {
-                RenderTileInfos(spriteBatch, TileTopRight, "TOPR");
-            }
-                        
-            if (TileBottomLeft != null)
-            {
-                RenderTileInfos(spriteBatch, TileBottomLeft, "BOTL");
-            }
-                        
-            if (TileBottomRight != null)
-            {
-                RenderTileInfos(spriteBatch, TileBottomRight, "BOTR");
+                if (TileBehind != null)
+                {
+                    RenderTileInfos(spriteBatch, TileBehind, "BEHI");
+                }
+                            
+                if (TileBottom != null)
+                {
+                    RenderTileInfos(spriteBatch, TileBottom, "BOTT");
+                }
+                            
+                if (TileLeft != null)
+                {
+                    RenderTileInfos(spriteBatch, TileLeft, "LEFT");
+                }
+                            
+                if (TileRight != null)
+                {
+                    RenderTileInfos(spriteBatch, TileRight, "RIGH");
+                }
+                            
+                if (TileTop != null)
+                {
+                    RenderTileInfos(spriteBatch, TileTop, "TOP");
+                }
+                            
+                if (TileTopLeft != null)
+                {
+                    RenderTileInfos(spriteBatch, TileTopLeft, "TOPL");
+                }
+                            
+                if (TileTopRight != null)
+                {
+                    RenderTileInfos(spriteBatch, TileTopRight, "TOPR");
+                }
+                            
+                if (TileBottomLeft != null)
+                {
+                    RenderTileInfos(spriteBatch, TileBottomLeft, "BOTL");
+                }
+                            
+                if (TileBottomRight != null)
+                {
+                    RenderTileInfos(spriteBatch, TileBottomRight, "BOTR");
+                }
+
             }
 
             // Hightlights the player position    
-            spriteBatch.DrawPoint(Position + ParentMap.camera.CameraPosition, Color.Red, 2);
-            spriteBatch.DrawPoint((Position - new Vector2(-16, 0)) + ParentMap.camera.CameraPosition, Color.Blue, 2);
-            spriteBatch.DrawPoint((Position - new Vector2(16, 0)) + ParentMap.camera.CameraPosition, Color.Yellow, 2);
+            if (Settings.Debug_RenderPlayerPositionPoints)
+            {
+                spriteBatch.DrawPoint(Position + ParentMap.camera.CameraPosition, Color.Red, 2);
+                spriteBatch.DrawPoint((Position - new Vector2(-16, 0)) + ParentMap.camera.CameraPosition, Color.Blue, 2);
+                spriteBatch.DrawPoint((Position - new Vector2(16, 0)) + ParentMap.camera.CameraPosition, Color.Yellow, 2);
+            }
             
 
             if (TileUnderCursor != null)
             {                  
                 Vector2 FixedPosition = new Vector2(((int)TileUnderCursor.TilePosition.X * 32) + (int)ParentMap.camera.CameraPosition.X, 
                     ((int)TileUnderCursor.TilePosition.Y * 32) + (int)ParentMap.camera.CameraPosition.Y);
-                    
-                // Draw tile texture box
-                spriteBatch.DrawRectangle(new Rectangle((int)FixedPosition.X, (int)FixedPosition.Y, 32, 32), Color.Black);
-                
-                // Draw tile texture
-                spriteBatch.Draw(TileUnderCursor.TileTexture, new Vector2(64, 128), Color.White);
-                
-                // Draw red box around the tile
-                spriteBatch.DrawRectangle(new Rectangle(64, 128, 32, 32), Color.Red);
 
                 // Draw tile cordinates
                 spriteBatch.DrawString(ParentMap.DebugFont, $"X:{TileUnderCursor.TilePosition.X}\n" + 
@@ -291,7 +295,7 @@ namespace Waxer.GameLogic
         public void BulletDamage(Bullet bullet)
         {
             if (bullet.ShooterInstanceID == InstanceID) { return; }
-            PlayerLife -= bullet.Damage;
+            Life -= bullet.Damage;
             BlendColor.R = 255;
             BlendColor.G = 0;
             BlendColor.B = 0;

@@ -11,10 +11,14 @@ namespace Waxer
         public bool IsColideable;
         int TileID = 0;
         Color BlendColor = Color.White;
+        public Chunk ParentChunk;
 
-        public MapTile()
+        public MapTile(Chunk ParentChunk, Vector2 TilePosition, Vector2 ScreenPosition, int TileID, bool IsColideable)
         {
-            SetTileID(0);
+            this.TilePosition = TilePosition;
+            this.ScreenPosition = ScreenPosition;
+            this.IsColideable = IsColideable;
+            SetTileID(TileID);
         }
 
         public void Draw(SpriteBatch spriteBatch)

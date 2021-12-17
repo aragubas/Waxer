@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Waxer.GameLogic;
 using System;
 using MonoGame.Extended;
+using Waxer.GameLogic.Player;
 
 namespace Waxer
 {

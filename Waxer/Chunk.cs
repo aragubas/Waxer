@@ -85,11 +85,10 @@ namespace Waxer
             { 
                 for(int y = 0; y < 32; y++)
                 {
-                    MapTile tile = new MapTile();
-                    tile.TilePosition = new Vector2((ChunkPosition.X * 32) + x, (ChunkPosition.Y * 32) + y);
-                    tile.ScreenPosition = new Vector2((ChunkPosition.X * 1024) + (x * 32), (ChunkPosition.Y * 1024) + (y * 32)); 
-                    tile.SetTileID(1);
-                    tile.IsColideable = true;
+                    MapTile tile = new MapTile(this, TilePosition: new Vector2((ChunkPosition.X * 32) + x, (ChunkPosition.Y * 32) + y),
+                                                ScreenPosition: new Vector2((ChunkPosition.X * 1024) + (x * 32), (ChunkPosition.Y * 1024) + (y * 32)),
+                                                TileID: 1, IsColideable: true);
+                     
                     tiles.Add(tile.TilePosition, tile);
                 }
             }
