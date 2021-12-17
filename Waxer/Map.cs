@@ -3,9 +3,115 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Waxer.GameLogic;
 using System;
+using MonoGame.Extended;
 
 namespace Waxer
 {
+    public class Chunk
+    {
+        public Dictionary<Vector2, MapTile> tiles = new();
+        public Vector2 ChunkPosition;
+        public Rectangle Area;
+        Map ParentMap; 
+        bool CheckChunks = false;
+            
+
+        public Chunk(Vector2 ChunkPosition, Map ParentMap)
+        {
+            this.ChunkPosition = ChunkPosition;
+            this.ParentMap = ParentMap;
+            FillTiles();
+            Area = new Rectangle((int)ChunkPosition.X * 1024, (int)ChunkPosition.Y * 1024, 1024, 1024);
+        }
+ 
+        public int Draw(SpriteBatch spriteBatch, Camera2D camera)
+        {
+            int i = 0;
+            foreach(MapTile tile in tiles.Values)
+            {
+                if (camera.IsOnScreen(tile.GetArea()))
+                {
+                    i++;
+                    tile.Draw(spriteBatch);
+                }
+            }
+
+            if (!CheckChunks)
+            {
+                CheckChunks = true;
+
+                // Left Chunk
+                if (ChunkPosition.X - 1 >= 1)
+                {
+                    if (!ParentMap.chunks.ContainsKey(new Vector2(ChunkPosition.X - 1, ChunkPosition.Y)))
+                    {                        
+                        ParentMap.chunks.Add(new Vector2(ChunkPosition.X - 1, ChunkPosition.Y), new Chunk(new Vector2(ChunkPosition.X - 1, ChunkPosition.Y), ParentMap));
+                    }
+                }
+
+                // Right Chunk
+                if (ChunkPosition.X + 1 >= 1)
+                {
+                    if (!ParentMap.chunks.ContainsKey(new Vector2(ChunkPosition.X + 1, ChunkPosition.Y)))
+                    {                        
+                        ParentMap.chunks.Add(new Vector2(ChunkPosition.X + 1, ChunkPosition.Y), new Chunk(new Vector2(ChunkPosition.X + 1, ChunkPosition.Y), ParentMap));
+                    }
+                }
+
+                // Top Chunk
+                if (ChunkPosition.Y - 1 >= 1)
+                {
+                    if (!ParentMap.chunks.ContainsKey(new Vector2(ChunkPosition.X, ChunkPosition.Y - 1)))
+                    {                        
+                        ParentMap.chunks.Add(new Vector2(ChunkPosition.X, ChunkPosition.Y - 1), new Chunk(new Vector2(ChunkPosition.X, ChunkPosition.Y - 1), ParentMap));
+                    }
+                }
+ 
+                // Bottom Chunk
+                if (ChunkPosition.Y + 1 >= 1)
+                {
+                    if (!ParentMap.chunks.ContainsKey(new Vector2(ChunkPosition.X, ChunkPosition.Y + 1)))
+                    {                        
+                        ParentMap.chunks.Add(new Vector2(ChunkPosition.X, ChunkPosition.Y + 1), new Chunk(new Vector2(ChunkPosition.X, ChunkPosition.Y + 1), ParentMap));
+                    }
+                }
+                 
+            }
+            
+            return i;
+        }
+
+        public void FillTiles()
+        {
+            // Fill with dirt tiles
+            for(int x = 0; x < 32; x++)
+            { 
+                for(int y = 0; y < 32; y++)
+                {
+                    MapTile tile = new MapTile();
+                    tile.TilePosition = new Vector2((ChunkPosition.X * 32) + x, (ChunkPosition.Y * 32) + y);
+                    tile.ScreenPosition = new Vector2((ChunkPosition.X * 1024) + (x * 32), (ChunkPosition.Y * 1024) + (y * 32)); 
+                    tile.SetTileID(1);
+                    tile.IsColideable = true;
+                    tiles.Add(tile.TilePosition, tile);
+                }
+            }
+             
+            // Just for testing colision          
+
+            for (int x = 4; x < 10; x++)
+            {
+                for (int y = 10; y < 15; y++)
+                {
+                    tiles[new Vector2((ChunkPosition.X * 32) + x, (ChunkPosition.Y * 32) + y)].SetTileID(0);
+                    tiles[new Vector2((ChunkPosition.X * 32) + x, (ChunkPosition.Y * 32) + y)].IsColideable = false;
+                }
+            }
+
+        }
+
+    }
+
     public struct MapProperties
     {
         public Vector2 TileSize;
@@ -14,65 +120,32 @@ namespace Waxer
     public struct EnvironmentSettings
     {
         public float Gravity = 28f;
-        public Vector2 WorldSize = Vector2.Zero;
     }
 
     public class Map
     {
         public MapProperties properties;
-        public Dictionary<Point, MapTile> tiles = new();
         public PlayerEntity player;
         public Camera2D camera = new Camera2D();
         public List<MapEntity> Entities = new List<MapEntity>();
         public EnvironmentSettings MapEnvironment = new EnvironmentSettings();
         public SpriteFont DebugFont;
-
+        public Dictionary<Vector2, Chunk> chunks = new();
 
         public Map()
         {
             properties = new MapProperties();
             properties.TileSize = new Vector2(32, 32);
             
-            // Fill with air tiles
-            for(int x = 0; x < 32; x++)
-            { 
-                for(int y = 0; y < 32; y++)
-                {
-                    MapTile tile = new MapTile();
-                    tile.TilePosition = new Vector2(x, y);
-                    tile.ScreenPosition = new Vector2(x * properties.TileSize.X, y * properties.TileSize.Y);
-                    tiles.Add(new Point(x, y), tile);
-                }
-            }
-            // Set the camera limit to the map
-            camera.ScreenLimit = new Vector2(32 * 32, 32 * 32);
+            Chunk chunk = new Chunk(new Vector2(0, 0), this);
+            chunks.Add(new Vector2(0, 0), chunk);
             
-            for (int x = 0; x < 32; x++)
-            {
-                for (int y = 20; y < 32; y++)
-                {
-                    tiles[new Point(x, y)].SetTileID(1);
-                    tiles[new Point(x, y)].IsColideable = true;
-                }
-            }
+            Chunk chunk2 = new Chunk(new Vector2(1, 0), this);
+            chunks.Add(new Vector2(1, 0), chunk2);
 
-            MapEnvironment.WorldSize = new Vector2(1024, 1024);
-             
-            // Just for testing colision          
-            tiles[new Point(1, 19)].SetTileID(1);
-            tiles[new Point(1, 19)].IsColideable = true;
-            
-            tiles[new Point(1, 18)].SetTileID(1);
-            tiles[new Point(1, 18)].IsColideable = true;
+            foreach(MapTile sinasTile in chunk2.tiles.Values) Console.WriteLine(sinasTile.TilePosition);
 
-            tiles[new Point(2, 19)].SetTileID(1);
-            tiles[new Point(2, 19)].IsColideable = true;
-
-            tiles[new Point(8, 19)].SetTileID(1);
-            tiles[new Point(8, 19)].IsColideable = true;
-            
-
-            player = new PlayerEntity(new Vector2(5 * 32, 12 * 32), this);
+            player = new PlayerEntity(new Vector2(6 * 32, 13 * 32), this);
             Entities.Add(new GameLogic.Towers.Test(new Vector2(32, 32), this));
             
         }
@@ -86,24 +159,33 @@ namespace Waxer
             }
 
             spriteBatch.Begin(transformMatrix: camera.GetMatrix());
-            int i = 0;
+            int Iterations = 0;
+            int chunksCount = 0;
+
+            Chunk[] chunkList = new Chunk[chunks.Count];
+            chunks.Values.CopyTo(chunkList, 0);
  
-            foreach(MapTile tile in tiles.Values)
+            for(int i = 0; i < chunkList.Length; i++)
             {
-                if (camera.IsOnScreen(tile.GetScreenPosition()))
+                if (camera.IsOnScreen(chunkList[i].Area))
                 {
-                    i++;
-                    tile.Draw(spriteBatch);
+                    chunksCount++;
+                    Iterations += chunkList[i].Draw(spriteBatch, camera);
+                    
+                    spriteBatch.DrawRectangle(chunkList[i].Area, Color.Red);
+
                 }
+
             }
 
-            spriteBatch.End();
-            
+            spriteBatch.End();            
             spriteBatch.Begin();
             
-            spriteBatch.DrawString(DebugFont, $"Tiles on Screen: {i}", new Vector2(0, 25), Color.Red);
+            spriteBatch.DrawString(DebugFont, $"Tiles on Screen: {Iterations}\n" + 
+                                              $"Chunks: {chunksCount}", new Vector2(0, 25), Color.Red);
 
             spriteBatch.End();
+
         }
 
         public void DrawEntities(SpriteBatch spriteBatch)
@@ -120,12 +202,12 @@ namespace Waxer
             spriteBatch.End();
         }
 
-        public void UpdateEntities(GameTime gameTime)
+        public void UpdateEntities(float delta)
         {
             for(int i = 0; i < Entities.Count; i++)
             {
                 Entities[i].UpdateScreenPosition(camera);
-                Entities[i].Update(gameTime);
+                Entities[i].Update(delta);
             }
  
  
@@ -138,7 +220,7 @@ namespace Waxer
 
             xPos = (int)pos.X / (int)properties.TileSize.X;
             yPos = (int)pos.Y / (int)properties.TileSize.Y;
-   
+
             return new Vector2(xPos, yPos);
         }
 
@@ -149,21 +231,21 @@ namespace Waxer
 
             xPos = rect.X / (int)properties.TileSize.X;
             yPos = rect.Y / (int)properties.TileSize.Y;
-   
+
             return new Vector2(xPos, yPos);
         }
 
 
         public MapTile GetTile(Vector2 pos)
         {
-            try
+            foreach(Chunk chunk in chunks.Values)
             {
-                return tiles[pos.ToPoint()];
-
-            } catch (System.Collections.Generic.KeyNotFoundException)
-            {
-                return null;
+                if (chunk.tiles.ContainsKey(pos))
+                {
+                    return chunk.tiles[pos];
+                }
             }
+            return null; 
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -176,13 +258,13 @@ namespace Waxer
   
         } 
 
-        public void Update(GameTime gameTime)
+        public void Update(float delta)
         {
-            camera.Update();
+            camera.Update(delta);
             
-            player.Update(gameTime);    
+            player.Update(delta);    
             
-            UpdateEntities(gameTime);
+            UpdateEntities(delta);
 
         }
 

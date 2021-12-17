@@ -6,7 +6,7 @@ namespace Waxer.GameLogic
 {
     public abstract class MapEntity : IDisposable
     {
-        public Vector2 Position = Vector2.Zero;
+        public Vector2 Position;
         public Vector2 ScreenPosition = Vector2.Zero;
         public string InstanceID = Guid.NewGuid().ToString();
         public Texture2D Texture = Graphics.Sprites.GetSprite("/missing_texture.png");
@@ -26,10 +26,15 @@ namespace Waxer.GameLogic
             ScreenPosition = new Vector2(Position.X + camera.CameraPosition.X, Position.Y + camera.CameraPosition.Y);
             CameraPosition = camera.CameraPosition;
         }
-         
-        public virtual void Update(GameTime gameTime) 
+        
+        internal void UpdateArea()
+        {
+            Area = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
+        }
+
+        public virtual void Update(float delta) 
         { 
-            Area = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); 
+            UpdateArea();
         }
 
         public virtual void DoAction(string ActionType, MapEntity entity)

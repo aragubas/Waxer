@@ -27,7 +27,7 @@ namespace Waxer.GameLogic
             }
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(float delta)
         {
             Area = new Rectangle((int)Position.X, (int)Position.Y, 32, 32);
             UpdateGrab();

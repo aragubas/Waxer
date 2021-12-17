@@ -17,10 +17,11 @@ namespace Waxer
 		{
 			graphics = new GraphicsDeviceManager(this);
 
-            IsFixedTimeStep = false;
-            this.TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 15);
+            IsFixedTimeStep = true;
+            TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 60);
 
-            graphics.SynchronizeWithVerticalRetrace = false;
+
+            graphics.SynchronizeWithVerticalRetrace = true;
             graphics.ApplyChanges();
 
             Reference = this;
@@ -47,7 +48,9 @@ namespace Waxer
             // Update mouse position
             MouseInput.Update();
 
-            gameMap.Update(gameTime);
+            float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            gameMap.Update(delta);
         }
 
         protected override void Draw(GameTime gameTime)

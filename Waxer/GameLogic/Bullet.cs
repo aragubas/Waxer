@@ -29,12 +29,12 @@ namespace Waxer.GameLogic
             spriteBatch.DrawRectangle(Area, Color.Green);
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(float delta)
         {
-            Timer += 1 * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Timer += 1 * delta;
             if (Timer >= Timespan) { ParentMap.Entities.Remove(this); return; }
             
-            Position += Direction * Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Position += Direction * Speed * delta;
             Area = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
             if (Area.Intersects(ParentMap.player.Area))

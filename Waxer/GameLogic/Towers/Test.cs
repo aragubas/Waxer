@@ -27,10 +27,10 @@ namespace Waxer.GameLogic.Towers
             ParentMap.Entities.Add(newBullet);
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(float delta)
         {
-            base.Update(gameTime);            
-            ShootDelay -= 1 * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            base.Update(delta);
+            ShootDelay -= 1 * delta;
             if (ShootDelay < 0) 
             { 
                 ShootDelay = ShootingDelaySeconds; 
@@ -50,9 +50,9 @@ namespace Waxer.GameLogic.Towers
                 
                 if (!tileUnder.IsColideable)
                 {
-                    Position.Y += (ParentMap.MapEnvironment.Gravity * GravityMultiplier) * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    Position.Y += (ParentMap.MapEnvironment.Gravity * GravityMultiplier) * delta;
 
-                    GravityMultiplier += 16f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    GravityMultiplier += 16f * delta;
 
 
                 }else  // Player hits the ground
