@@ -11,7 +11,7 @@ namespace Waxer.GameLogic
         public string InstanceID = Guid.NewGuid().ToString();
         public Texture2D Texture = Graphics.Sprites.GetSprite("/missing_texture.png");
         public Color BlendColor = Color.White;
-        public Map ParentMap;
+        public GameWorld World;
         internal Vector2 CameraPosition = Vector2.Zero;
         public Rectangle Area;
         public float Opacity = 1f;
@@ -50,7 +50,7 @@ namespace Waxer.GameLogic
 
         public void Dispose()
         {
-            ParentMap.Entities.Remove(this);
+            World.Entities.Remove(this);
         }
 
     }

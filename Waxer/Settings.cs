@@ -15,11 +15,13 @@ namespace Waxer
         public static string FontsPath = ContentFolder + "fonts\\";
         public static string ImagePath = ContentFolder + "img\\";
         public static string SoundPath = ContentFolder + "sound\\";
-        public static string DataPath = ContentFolder + "data\\";
+        public static string ConfigPath = ContentFolder + "config\\";
         
         // Debug options
         public static bool Debug_RenderColidersTiles = false;
         public static bool Debug_RenderPlayerPositionPoints = false;
+        public static bool Debug_RenderItemsRangeBox = true;
+        
 
     }
 }

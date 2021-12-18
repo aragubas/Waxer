@@ -9,11 +9,11 @@ namespace Waxer
         public Dictionary<Vector2, MapTile> tiles = new();
         public Vector2 ChunkPosition;
         public Rectangle Area;
-        Map ParentMap; 
+        GameWorld ParentMap; 
         bool CheckChunks = false;
             
 
-        public Chunk(Vector2 ChunkPosition, Map ParentMap)
+        public Chunk(Vector2 ChunkPosition, GameWorld ParentMap)
         {
             this.ChunkPosition = ChunkPosition;
             this.ParentMap = ParentMap;
@@ -87,8 +87,8 @@ namespace Waxer
                 {
                     MapTile tile = new MapTile(this, TilePosition: new Vector2((ChunkPosition.X * 32) + x, (ChunkPosition.Y * 32) + y),
                                                 ScreenPosition: new Vector2((ChunkPosition.X * 1024) + (x * 32), (ChunkPosition.Y * 1024) + (y * 32)),
-                                                TileID: 1, IsColideable: true);
-                     
+                                                TileID: 1);
+                    
                     tiles.Add(tile.TilePosition, tile);
                 }
             }
@@ -100,7 +100,6 @@ namespace Waxer
                 for (int y = 10; y < 15; y++)
                 {
                     tiles[new Vector2((ChunkPosition.X * 32) + x, (ChunkPosition.Y * 32) + y)].SetTileID(0);
-                    tiles[new Vector2((ChunkPosition.X * 32) + x, (ChunkPosition.Y * 32) + y)].IsColideable = false;
                 }
             }
 

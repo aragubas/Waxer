@@ -15,10 +15,10 @@ namespace Waxer.GameLogic
         public string ShooterInstanceID;
         MapTile TileUnder = null; 
 
-        public Bullet(Vector2 initialPosition, Map parentMap, string ShooterInstanceID)
+        public Bullet(Vector2 initialPosition, GameWorld parentMap, string ShooterInstanceID)
         {
             Position = initialPosition;
-            ParentMap = parentMap;
+            World = parentMap;
             Texture = Graphics.Sprites.GetSprite("/bullet.png");
             this.ShooterInstanceID = ShooterInstanceID;
         }
@@ -32,14 +32,14 @@ namespace Waxer.GameLogic
         public override void Update(float delta)
         {
             Timer += 1 * delta;
-            if (Timer >= Timespan) { ParentMap.Entities.Remove(this); return; }
+            if (Timer >= Timespan) { World.Entities.Remove(this); return; }
             
             Position += Direction * Speed * delta;
             Area = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
-            if (Area.Intersects(ParentMap.player.Area))
+            if (Area.Intersects(World.Player.Area))
             {
-                ParentMap.player.BulletDamage(this);
+                World.Player.BulletDamage(this);
                 Dispose();
                 return;
             }
@@ -47,9 +47,9 @@ namespace Waxer.GameLogic
 
             try
             {
-                TileUnder = ParentMap.GetTile(ParentMap.GetTilePosition(Position));
+                TileUnder = World.GetTile(World.GetTilePosition(Position));
 
-                if (TileUnder.IsColideable)
+                if (TileUnder.TileInformation.IsColideable)
                 { 
                     Dispose();
                 }

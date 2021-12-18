@@ -1,30 +1,58 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Waxer
 {
+    public struct TileInfo
+    {
+        public int TileID;
+        public bool IsColideable;
+        public string Name;
+        public Texture2D Texture;
+
+        public TileInfo(int TileID, bool IsColideable, string Name, Texture2D Texture)
+        {
+            this.TileID = TileID;
+            this.Name = Name;
+            this.Texture = Texture;
+            this.IsColideable = IsColideable;
+        }
+    }
+
+    public static class TilesInfo
+    {
+        public static Dictionary<int, TileInfo> TileInfos = new Dictionary<int, TileInfo>();
+
+        public static void LoadTileInfos()
+        {
+            TileInfos.Clear();
+             
+            TileInfos.Add(0, new TileInfo(0, false, "Background Dirt", Graphics.Sprites.GetSprite("/tiles/0.png")));
+            TileInfos.Add(1, new TileInfo(1, true, "Dirt", Graphics.Sprites.GetSprite("/tiles/1.png")));
+        }
+
+    }
+
     public class MapTile
     {
         public Vector2 ScreenPosition;
         public Vector2 TilePosition;
-        public Texture2D TileTexture;
-        public bool IsColideable;
+        public TileInfo TileInformation;
         int TileID = 0;
         Color BlendColor = Color.White;
         public Chunk ParentChunk;
 
-        public MapTile(Chunk ParentChunk, Vector2 TilePosition, Vector2 ScreenPosition, int TileID, bool IsColideable)
+        public MapTile(Chunk ParentChunk, Vector2 TilePosition, Vector2 ScreenPosition, int TileID)
         {
             this.TilePosition = TilePosition;
             this.ScreenPosition = ScreenPosition;
-            this.IsColideable = IsColideable;
             SetTileID(TileID);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            if (this.TileTexture == null) { return; }
-            spriteBatch.Draw(TileTexture, ScreenPosition, BlendColor);
+            spriteBatch.Draw(TileInformation.Texture, ScreenPosition, BlendColor);
         }
 
         public Rectangle GetScreenPosition()
@@ -47,9 +75,12 @@ namespace Waxer
         public void SetTileID(int newTileID)
         {
             TileID = newTileID;
+            
+            if (TilesInfo.TileInfos.ContainsKey(newTileID))
+            {
+                TileInformation = TilesInfo.TileInfos[newTileID];
+            }
 
-            // Update the texture
-            TileTexture = Graphics.Sprites.GetSprite($"tiles/{TileID}.png");
         }
 
         public int GetTileID()

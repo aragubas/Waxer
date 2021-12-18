@@ -10,17 +10,17 @@ namespace Waxer
 		public GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
         public CursorRenderer cursorRender;
-        Map gameMap;
+        GameWorld gameMap;
         public static GameMain Reference;
 
 		public GameMain()
 		{
 			graphics = new GraphicsDeviceManager(this);
 
-            IsFixedTimeStep = true;
-            TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 60);
+            IsFixedTimeStep = false;
+            //TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 60);
 
-            graphics.SynchronizeWithVerticalRetrace = true;
+            graphics.SynchronizeWithVerticalRetrace = false;
             graphics.ApplyChanges();
 
             Reference = this;
@@ -38,8 +38,11 @@ namespace Waxer
             // Creates a new cursor renderer
             cursorRender = new CursorRenderer();
             
+            // Load tile information
+            TilesInfo.LoadTileInfos();
+
             // Creates a new game map
-            gameMap = new Map();
+            gameMap = new GameWorld();
 		}
 
         protected override void Update(GameTime gameTime)

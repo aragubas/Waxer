@@ -5,6 +5,7 @@ using Waxer.GameLogic;
 using System;
 using MonoGame.Extended;
 using Waxer.GameLogic.Player;
+using Waxer.GameLogic.Player.Inventory;
 
 namespace Waxer
 {
@@ -18,34 +19,32 @@ namespace Waxer
         public float Gravity = 28f;
     }
 
-    public class Map
+    public class GameWorld
     {
-        public MapProperties properties;
-        public PlayerEntity player;
-        public Camera2D camera = new Camera2D();
+        public MapProperties Properties;
+        public PlayerEntity Player;
+        public Camera2D Camera = new Camera2D();
         public List<MapEntity> Entities = new List<MapEntity>();
         public EnvironmentSettings MapEnvironment = new EnvironmentSettings();
         public SpriteFont DebugFont;
         public Dictionary<Vector2, Chunk> chunks = new();
+        InventoryUI inventoryUI;
 
-        public Map()
+        public GameWorld()
         {
-            properties = new MapProperties();
-            properties.TileSize = new Vector2(32, 32);
+            Properties = new MapProperties();
+            Properties.TileSize = new Vector2(32, 32);
             
-            Chunk chunk = new Chunk(new Vector2(0, 0), this);
-            chunks.Add(new Vector2(0, 0), chunk);
-            
-            Chunk chunk2 = new Chunk(new Vector2(1, 0), this);
-            chunks.Add(new Vector2(1, 0), chunk2);
+            Chunk initialChunk = new Chunk(new Vector2(0, 0), this);
+            chunks.Add(new Vector2(0, 0), initialChunk);
 
-            foreach(MapTile sinasTile in chunk2.tiles.Values) Console.WriteLine(sinasTile.TilePosition);
-
-            player = new PlayerEntity(new Vector2(6 * 32, 13 * 32), this);
-            Entities.Add(new GameLogic.Towers.Test(new Vector2(32, 32), this));
+            Player = new PlayerEntity(new Vector2(8  * 32, 10 * 32), this);
+            Entities.Add(new GameLogic.Towers.Test(new Vector2(4 * 32, 9 * 32), this));
             
-        }
-   
+            inventoryUI = new InventoryUI(Player);
+
+        } 
+
         // Draw the map on its batch
         void DrawMap(SpriteBatch spriteBatch)
         {
@@ -54,7 +53,7 @@ namespace Waxer
                 DebugFont = Graphics.Fonts.GetSpriteFont(Graphics.Fonts.GetFontDescriptor("/PressStart2P", 8, spriteBatch.GraphicsDevice));
             }
 
-            spriteBatch.Begin(transformMatrix: camera.GetMatrix());
+            spriteBatch.Begin(transformMatrix: Camera.GetMatrix());
             int Iterations = 0;
             int chunksCount = 0;
 
@@ -63,37 +62,28 @@ namespace Waxer
  
             for(int i = 0; i < chunkList.Length; i++)
             {
-                if (camera.IsOnScreen(chunkList[i].Area))
+                if (Camera.IsOnScreen(chunkList[i].Area))
                 {
                     chunksCount++;
-                    Iterations += chunkList[i].Draw(spriteBatch, camera);
-                    
-                    spriteBatch.DrawRectangle(chunkList[i].Area, Color.Red);
+                    Iterations += chunkList[i].Draw(spriteBatch, Camera);
 
                 }
 
             }
 
-            spriteBatch.End();            
-            spriteBatch.Begin();
-            
-            spriteBatch.DrawString(DebugFont, $"Tiles on Screen: {Iterations}\n" + 
-                                              $"Chunks: {chunksCount}", new Vector2(0, 25), Color.Red);
-
             spriteBatch.End();
-
         }
 
         public void DrawEntities(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin(transformMatrix: camera.GetMatrix());
+            spriteBatch.Begin(transformMatrix: Camera.GetMatrix());
 
             for(int i = 0; i < Entities.Count; i++)
             {
                 Entities[i].Draw(spriteBatch);
             }
             
-            player.Draw(spriteBatch);
+            Player.Draw(spriteBatch);
 
             spriteBatch.End();
         }
@@ -102,7 +92,7 @@ namespace Waxer
         {
             for(int i = 0; i < Entities.Count; i++)
             {
-                Entities[i].UpdateScreenPosition(camera);
+                Entities[i].UpdateScreenPosition(Camera);
                 Entities[i].Update(delta);
             }
  
@@ -114,8 +104,8 @@ namespace Waxer
             int xPos = 0;
             int yPos = 0;
 
-            xPos = (int)pos.X / (int)properties.TileSize.X;
-            yPos = (int)pos.Y / (int)properties.TileSize.Y;
+            xPos = (int)pos.X / (int)Properties.TileSize.X;
+            yPos = (int)pos.Y / (int)Properties.TileSize.Y;
 
             return new Vector2(xPos, yPos);
         }
@@ -125,8 +115,8 @@ namespace Waxer
             int xPos = 0;
             int yPos = 0;
 
-            xPos = rect.X / (int)properties.TileSize.X;
-            yPos = rect.Y / (int)properties.TileSize.Y;
+            xPos = rect.X / (int)Properties.TileSize.X;
+            yPos = rect.Y / (int)Properties.TileSize.Y;
 
             return new Vector2(xPos, yPos);
         }
@@ -144,24 +134,41 @@ namespace Waxer
             return null; 
         }
 
+        public bool SetTile(Vector2 pos, TileInfo newInfos)
+        {
+            foreach(Chunk chunk in chunks.Values)
+            {
+                if (chunk.tiles.ContainsKey(pos))
+                {
+                    chunk.tiles[pos].TileInformation = newInfos;
+                    return true;
+                }
+            }
+            return false; 
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             // Center the camera to the center of the player
-            camera.CenterTo(new Vector2(player.Position.X + player.Texture.Width / 2, player.Position.Y + player.Texture.Height / 2), spriteBatch.GraphicsDevice.Viewport);
+            Camera.CenterTo(new Vector2(Player.Position.X + Player.Texture.Width / 2, Player.Position.Y + Player.Texture.Height / 2), spriteBatch.GraphicsDevice.Viewport);
 
             DrawMap(spriteBatch);
             DrawEntities(spriteBatch);
-  
+
+            inventoryUI.Draw(spriteBatch);
+
         } 
 
         public void Update(float delta)
         {
-            camera.Update(delta);
+            Camera.Update(delta);
             
-            player.Update(delta);    
+            Player.Update(delta);    
             
             UpdateEntities(delta);
 
+            inventoryUI.Update(delta);
+            
         }
 
     }

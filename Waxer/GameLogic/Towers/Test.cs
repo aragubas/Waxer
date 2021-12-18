@@ -11,20 +11,20 @@ namespace Waxer.GameLogic.Towers
         float GravityMultiplier;
         bool CanShoot = false;
 
-        public Test(Vector2 InitialPosition, Map parentMap)
+        public Test(Vector2 InitialPosition, GameWorld parentMap)
         {
             Position = InitialPosition;
             Texture = Graphics.Sprites.GetSprite("/towers/test.png");
-            ParentMap = parentMap;
+            World = parentMap;
         }
  
         private void Shoot()
         {
-            Bullet newBullet = new Bullet(new Vector2(Position.X + 16, Position.Y + 16), ParentMap, InstanceID);
-            newBullet.Direction = -(Position - (ParentMap.player.Position));
+            Bullet newBullet = new Bullet(new Vector2(Position.X + 16, Position.Y + 16), World, InstanceID);
+            newBullet.Direction = -(Position - (World.Player.Position));
             newBullet.Direction.Normalize();
 
-            ParentMap.Entities.Add(newBullet);
+            World.Entities.Add(newBullet);
         }
 
         public override void Update(float delta)
@@ -37,7 +37,7 @@ namespace Waxer.GameLogic.Towers
                 CanShoot = true;
             }
 
-            float Distance = Vector2.Distance(new Vector2(Position.X + 16, Position.Y - 16), new Vector2(ParentMap.player.Position.X + 16, ParentMap.player.Position.Y + 16));
+            float Distance = Vector2.Distance(new Vector2(Position.X + 16, Position.Y - 16), new Vector2(World.Player.Position.X + 16, World.Player.Position.Y + 16));
             if (Distance <= 300 && CanShoot)
             {
                 CanShoot = false;
@@ -46,11 +46,11 @@ namespace Waxer.GameLogic.Towers
 
             try
             {
-                MapTile tileUnder = ParentMap.GetTile(ParentMap.GetTilePosition(Position) - -Vector2.UnitY);
+                MapTile tileUnder = World.GetTile(World.GetTilePosition(Position) - -Vector2.UnitY);
                 
-                if (!tileUnder.IsColideable)
+                if (!tileUnder.TileInformation.IsColideable)
                 {
-                    Position.Y += (ParentMap.MapEnvironment.Gravity * GravityMultiplier) * delta;
+                    Position.Y += (World.MapEnvironment.Gravity * GravityMultiplier) * delta;
 
                     GravityMultiplier += 16f * delta;
 

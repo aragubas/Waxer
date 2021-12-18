@@ -13,7 +13,7 @@ namespace Waxer.GameLogic
         public float Acceleration = 1.8f;
         public float JumpMultiplier = 8f;
         public int Life = 300;
-        internal KeyboardState oldState;
+        private KeyboardState oldState;
         internal Vector2 AimVector = Vector2.Zero;
         internal float GravityMultiplier = 0f;
         internal bool IsJumping = false;
@@ -38,8 +38,8 @@ namespace Waxer.GameLogic
         //
         internal void RenderTileInfos(SpriteBatch spriteBatch, MapTile tile, string TileName)
         {
-            Vector2 FixedPosition = new Vector2(((int)tile.TilePosition.X * 32) + (int)ParentMap.camera.CameraPosition.X, 
-                ((int)tile.TilePosition.Y * 32) + (int)ParentMap.camera.CameraPosition.Y);
+            Vector2 FixedPosition = new Vector2(((int)tile.TilePosition.X * 32) + (int)World.Camera.CameraPosition.X, 
+                ((int)tile.TilePosition.Y * 32) + (int)World.Camera.CameraPosition.Y);
 
             Color sinasColor = Color.Red;
             sinasColor.A = (byte)30;
@@ -47,7 +47,7 @@ namespace Waxer.GameLogic
             spriteBatch.DrawRectangle(new Rectangle((int)FixedPosition.X, (int)FixedPosition.Y, 32, 32), sinasColor);
 
             // Draw tile cordinates
-            spriteBatch.DrawString(ParentMap.DebugFont, $"X:{tile.TilePosition.X}\n" + 
+            spriteBatch.DrawString(World.DebugFont, $"X:{tile.TilePosition.X}\n" + 
                                                         $"Y:{tile.TilePosition.Y}\n{TileName}", FixedPosition, sinasColor);
 
         }
@@ -108,25 +108,25 @@ namespace Waxer.GameLogic
             }
 
             // Draw last delta
-            spriteBatch.DrawString(ParentMap.DebugFont, $"delta: {LastDelta}\n" + 
+            spriteBatch.DrawString(World.DebugFont, $"delta: {LastDelta}\n" + 
                                                         $"move_speed: {MoveSpeed}", new Vector2(12, 50), Color.Red);
 
             // Hightlights the player position    
             if (Settings.Debug_RenderPlayerPositionPoints)
             {
-                spriteBatch.DrawPoint(Position + ParentMap.camera.CameraPosition, Color.Red, 2);
-                spriteBatch.DrawPoint((Position - new Vector2(-16, 0)) + ParentMap.camera.CameraPosition, Color.Blue, 2);
-                spriteBatch.DrawPoint((Position - new Vector2(16, 0)) + ParentMap.camera.CameraPosition, Color.Yellow, 2);
+                spriteBatch.DrawPoint(Position + World.Camera.CameraPosition, Color.Red, 2);
+                spriteBatch.DrawPoint((Position - new Vector2(-16, 0)) + World.Camera.CameraPosition, Color.Blue, 2);
+                spriteBatch.DrawPoint((Position - new Vector2(16, 0)) + World.Camera.CameraPosition, Color.Yellow, 2);
             }
             
             // Draws information about the tile under the mouse cursor
             if (TileUnderCursor != null)
             {                  
-                Vector2 FixedPosition = new Vector2(((int)TileUnderCursor.TilePosition.X * 32) + (int)ParentMap.camera.CameraPosition.X, 
-                    ((int)TileUnderCursor.TilePosition.Y * 32) + (int)ParentMap.camera.CameraPosition.Y);
+                Vector2 FixedPosition = new Vector2(((int)TileUnderCursor.TilePosition.X * 32) + (int)World.Camera.CameraPosition.X, 
+                    ((int)TileUnderCursor.TilePosition.Y * 32) + (int)World.Camera.CameraPosition.Y);
 
                 // Draw tile cordinates
-                spriteBatch.DrawString(ParentMap.DebugFont, $"X:{TileUnderCursor.TilePosition.X}\n" + 
+                spriteBatch.DrawString(World.DebugFont, $"X:{TileUnderCursor.TilePosition.X}\n" + 
                                                             $"Y:{TileUnderCursor.TilePosition.Y}", FixedPosition, Color.Black);
 
             }
@@ -144,45 +144,45 @@ namespace Waxer.GameLogic
         void GetTilesAround()
         {
             // Tile Under Cursor
-            MapTile newTile = ParentMap.GetTile(ParentMap.GetTilePosition(MouseInput.PositionVector2 - ParentMap.camera.CameraPosition));
+            MapTile newTile = World.GetTile(World.GetTilePosition(MouseInput.PositionVector2 - World.Camera.CameraPosition));
             if (newTile != null) { TileUnderCursor = newTile; }
 
             // Tile Behind
-            newTile = ParentMap.GetTile(ParentMap.GetTilePosition(Position));
+            newTile = World.GetTile(World.GetTilePosition(Position));
             if (newTile != null) { TileBehind = newTile; }
 
             // Tile Top
-            newTile = ParentMap.GetTile(TileBehind.TilePosition + new Vector2(0, -1));
+            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(0, -1));
             if (newTile != null) { TileTop = newTile; }
 
             // Tile Bottom
-            newTile = ParentMap.GetTile(TileBehind.TilePosition + new Vector2(0, 1));
+            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(0, 1));
             if (newTile != null) { TileBottom = newTile; }
 
             // Tile Left
-            newTile = ParentMap.GetTile(TileBehind.TilePosition + new Vector2(-1, 0));
+            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(-1, 0));
             if (newTile != null) { TileLeft = newTile; }
 
             // Tile Right
-            newTile = ParentMap.GetTile(TileBehind.TilePosition + new Vector2(1, 0));
+            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(1, 0));
             if (newTile != null) { TileRight = newTile; }
 
             // Corner Edges Tiles
 
             // Tile TopLeft
-            newTile = ParentMap.GetTile(TileBehind.TilePosition + new Vector2(-1, -1));
+            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(-1, -1));
             if (newTile != null) { TileTopLeft = newTile; }
 
             // Tile TopRight
-            newTile = ParentMap.GetTile(TileBehind.TilePosition + new Vector2(1, -1));
+            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(1, -1));
             if (newTile != null) { TileTopRight = newTile; }
 
             // Tile BottomLeft
-            newTile = ParentMap.GetTile(TileBehind.TilePosition + new Vector2(-1, 1));
+            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(-1, 1));
             if (newTile != null) { TileBottomLeft = newTile; }
 
             // Tile BottomRight 
-            newTile = ParentMap.GetTile(TileBehind.TilePosition + new Vector2(1, 1));
+            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(1, 1));
             if (newTile != null) { TileBottomRight = newTile; }
  
         }
@@ -220,13 +220,13 @@ namespace Waxer.GameLogic
         //
         void UpdateGravity(float delta)
         {
-            Rectangle FixedArea = new Rectangle(Area.X - 16, Area.Y + (int)ParentMap.MapEnvironment.Gravity, 32, 32);
-            Rectangle FixedAreaLeft = new Rectangle(Area.X - 14, Area.Y + (int)ParentMap.MapEnvironment.Gravity, 32, 32);
-            Rectangle AreaSinas = new Rectangle(Area.X - 16, Area.Y + (int)ParentMap.MapEnvironment.Gravity, 32, 32);
+            Rectangle FixedArea = new Rectangle(Area.X - 16, Area.Y + (int)World.MapEnvironment.Gravity, 32, 32);
+            Rectangle FixedAreaLeft = new Rectangle(Area.X - 14, Area.Y + (int)World.MapEnvironment.Gravity, 32, 32);
+            Rectangle AreaSinas = new Rectangle(Area.X - 16, Area.Y + (int)World.MapEnvironment.Gravity, 32, 32);
 
-            bool ColidingBottom = (TileBottom.GetArea().Intersects(FixedArea) && TileBottom.IsColideable);
-            bool ColidingBottomLeft = (TileBottomLeft.GetArea().Intersects(FixedAreaLeft) && TileBottomLeft.IsColideable);
-            bool ColidingBottomRight = (TileBottomRight.GetArea().Intersects(FixedArea) && TileBottomRight.IsColideable);
+            bool ColidingBottom = (TileBottom.GetArea().Intersects(FixedArea) && TileBottom.TileInformation.IsColideable);
+            bool ColidingBottomLeft = (TileBottomLeft.GetArea().Intersects(FixedAreaLeft) && TileBottomLeft.TileInformation.IsColideable);
+            bool ColidingBottomRight = (TileBottomRight.GetArea().Intersects(FixedArea) && TileBottomRight.TileInformation.IsColideable);
 
             if (ColidingBottom) { Position.Y = TileBottom.GetArea().Y - 32; UpdateArea(); }
             //if (ColidingBottomLeft) { Position.Y = TileBottomLeft.GetArea().Y - 32; UpdateArea(); }
@@ -252,7 +252,7 @@ namespace Waxer.GameLogic
             }else  
             { 
                 // Pulls the player to the ground, to simulate gravity
-                float Force = (ParentMap.MapEnvironment.Gravity * GravityMultiplier) * delta;
+                float Force = (World.MapEnvironment.Gravity * GravityMultiplier) * delta;
                 Position.Y += Force;
                 UpdateArea();
 
@@ -271,17 +271,17 @@ namespace Waxer.GameLogic
             Vector2 MoveVector = new Vector2();
   
             Rectangle FixedAreaRight = new Rectangle((Area.X + 16), Area.Y, 32, 32);
-            MapTile FixedRightTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaRight));
+            MapTile FixedRightTile = World.GetTile(World.GetTilePosition(FixedAreaRight));
             Rectangle FixedAreaRightBottom = new Rectangle((Area.X + 16), Area.Y + 32, 32, 32);
-            MapTile FixedRightBottomTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaRightBottom));
+            MapTile FixedRightBottomTile = World.GetTile(World.GetTilePosition(FixedAreaRightBottom));
             Rectangle FixedAreaRightTop = new Rectangle((Area.X + 16), Area.Y - 32, 32, 32);
-            MapTile FixedRightTopTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaRightTop));
+            MapTile FixedRightTopTile = World.GetTile(World.GetTilePosition(FixedAreaRightTop));
  
-            if (FixedRightTile.IsColideable && !FixedRightTile.GetArea().Intersects(Area))
+            if (FixedRightTile.TileInformation.IsColideable && !FixedRightTile.GetArea().Intersects(Area))
             {
-                if (FixedRightTopTile.IsColideable && !FixedRightTopTile.GetArea().Intersects(Area))
+                if (FixedRightTopTile.TileInformation.IsColideable && !FixedRightTopTile.GetArea().Intersects(Area))
                 {
-                    if (FixedRightBottomTile.IsColideable && !FixedRightBottomTile.GetArea().Intersects(Area))
+                    if (FixedRightBottomTile.TileInformation.IsColideable && !FixedRightBottomTile.GetArea().Intersects(Area))
                     {
                         MoveVector.X = -1;
                         Console.WriteLine("Conter X-");
@@ -291,17 +291,17 @@ namespace Waxer.GameLogic
 
             Rectangle LeftColision = new Rectangle(Area.X - 16, Area.Y, Area.Width, Area.Height);
             Rectangle FixedAreaLeft = new Rectangle((Area.X - 16), Area.Y, 32, 32);
-            MapTile FixedLeftTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaLeft));
+            MapTile FixedLeftTile = World.GetTile(World.GetTilePosition(FixedAreaLeft));
             Rectangle FixedAreaLeftBottom = new Rectangle((Area.X - 16), Area.Y + 32, 32, 32);
-            MapTile FixedLeftBottomTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaLeftBottom));
+            MapTile FixedLeftBottomTile = World.GetTile(World.GetTilePosition(FixedAreaLeftBottom));
             Rectangle FixedAreaLeftTop = new Rectangle((Area.X - 16), Area.Y - 32, 32, 32);
-            MapTile FixedLeftTopTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaLeftTop));
+            MapTile FixedLeftTopTile = World.GetTile(World.GetTilePosition(FixedAreaLeftTop));
 
-            if (FixedLeftTile.IsColideable && !FixedLeftTile.GetArea().Intersects(LeftColision))
+            if (FixedLeftTile.TileInformation.IsColideable && !FixedLeftTile.GetArea().Intersects(LeftColision))
             {
-                if (FixedLeftTopTile.IsColideable && !FixedLeftTopTile.GetArea().Intersects(LeftColision))
+                if (FixedLeftTopTile.TileInformation.IsColideable && !FixedLeftTopTile.GetArea().Intersects(LeftColision))
                 {
-                    if (FixedLeftBottomTile.IsColideable && !FixedLeftBottomTile.GetArea().Intersects(LeftColision))
+                    if (FixedLeftBottomTile.TileInformation.IsColideable && !FixedLeftBottomTile.GetArea().Intersects(LeftColision))
                     {
                         MoveVector.X = 1;
                         Console.WriteLine("Conter X+");
@@ -353,19 +353,19 @@ namespace Waxer.GameLogic
 
             Rectangle RightColision = new Rectangle(Area.X + 2, Area.Y, Area.Width, Area.Height);
             Rectangle FixedAreaRight = new Rectangle((Area.X + 18), Area.Y, 32, 32);
-            MapTile FixedRightTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaRight));
+            MapTile FixedRightTile = World.GetTile(World.GetTilePosition(FixedAreaRight));
             Rectangle FixedAreaRightBottom = new Rectangle((Area.X + 16), Area.Y + 32, 32, 32);
-            MapTile FixedRightBottomTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaRightBottom));
+            MapTile FixedRightBottomTile = World.GetTile(World.GetTilePosition(FixedAreaRightBottom));
             Rectangle FixedAreaRightTop = new Rectangle((Area.X + 18), Area.Y - 32, 32, 32);
-            MapTile FixedRightTopTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaRightTop));
+            MapTile FixedRightTopTile = World.GetTile(World.GetTilePosition(FixedAreaRightTop));
  
             if (Utils.CheckKeyDown(oldState, State, Keys.D))
             {
-                if (FixedRightTile.IsColideable && !FixedRightTile.GetArea().Intersects(RightColision) || !FixedRightTile.IsColideable)
+                if (FixedRightTile.TileInformation.IsColideable && !FixedRightTile.GetArea().Intersects(RightColision) || !FixedRightTile.TileInformation.IsColideable)
                 {
-                    if (FixedRightTopTile.IsColideable && !FixedRightTopTile.GetArea().Intersects(RightColision) || !FixedRightTopTile.IsColideable)
+                    if (FixedRightTopTile.TileInformation.IsColideable && !FixedRightTopTile.GetArea().Intersects(RightColision) || !FixedRightTopTile.TileInformation.IsColideable)
                     {
-                        if (FixedRightBottomTile.IsColideable && !FixedRightBottomTile.GetArea().Intersects(RightColision) || !FixedRightBottomTile.IsColideable)
+                        if (FixedRightBottomTile.TileInformation.IsColideable && !FixedRightBottomTile.GetArea().Intersects(RightColision) || !FixedRightBottomTile.TileInformation.IsColideable)
                         {
                             MoveVector.X = 1;
                         }
@@ -376,19 +376,19 @@ namespace Waxer.GameLogic
 
             Rectangle LeftColision = new Rectangle(Area.X - 18, Area.Y, Area.Width, Area.Height);
             Rectangle FixedAreaLeft = new Rectangle((Area.X - 18), Area.Y, 32, 32);
-            MapTile FixedLeftTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaLeft));
+            MapTile FixedLeftTile = World.GetTile(World.GetTilePosition(FixedAreaLeft));
             Rectangle FixedAreaLeftBottom = new Rectangle((Area.X - 18), Area.Y + 32, 32, 32);
-            MapTile FixedLeftBottomTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaLeftBottom));
+            MapTile FixedLeftBottomTile = World.GetTile(World.GetTilePosition(FixedAreaLeftBottom));
             Rectangle FixedAreaLeftTop = new Rectangle((Area.X - 18), Area.Y - 32, 32, 32);
-            MapTile FixedLeftTopTile = ParentMap.GetTile(ParentMap.GetTilePosition(FixedAreaLeftTop));
+            MapTile FixedLeftTopTile = World.GetTile(World.GetTilePosition(FixedAreaLeftTop));
 
             if (Utils.CheckKeyDown(oldState, State, Keys.A))
             {
-                if (FixedLeftTile.IsColideable && !FixedLeftTile.GetArea().Intersects(LeftColision) || !FixedLeftTile.IsColideable)
+                if (FixedLeftTile.TileInformation.IsColideable && !FixedLeftTile.GetArea().Intersects(LeftColision) || !FixedLeftTile.TileInformation.IsColideable)
                 {
-                    if (FixedLeftTopTile.IsColideable && !FixedLeftTopTile.GetArea().Intersects(LeftColision) || !FixedLeftTopTile.IsColideable)
+                    if (FixedLeftTopTile.TileInformation.IsColideable && !FixedLeftTopTile.GetArea().Intersects(LeftColision) || !FixedLeftTopTile.TileInformation.IsColideable)
                     {
-                        if (FixedLeftBottomTile.IsColideable && !FixedLeftBottomTile.GetArea().Intersects(LeftColision) || !FixedLeftBottomTile.IsColideable)
+                        if (FixedLeftBottomTile.TileInformation.IsColideable && !FixedLeftBottomTile.GetArea().Intersects(LeftColision) || !FixedLeftBottomTile.TileInformation.IsColideable)
                         {
                             MoveVector.X = -1;
                         }
@@ -419,12 +419,12 @@ namespace Waxer.GameLogic
  
             if (Utils.CheckKeyUp(oldState, State, Keys.Space))
             {
-                Bullet newBullet = new Bullet(new Vector2(Position.X + 16, Position.Y + 16), ParentMap, InstanceID);
+                Bullet newBullet = new Bullet(new Vector2(Position.X + 16, Position.Y + 16), World, InstanceID);
                 newBullet.Direction = AimVector;
-                newBullet.ParentMap = ParentMap;
+                newBullet.World = World;
                 newBullet.Direction.Normalize();
                 
-                ParentMap.Entities.Add(newBullet);
+                World.Entities.Add(newBullet);
             }
 
             oldState = State;
@@ -448,20 +448,20 @@ namespace Waxer.GameLogic
         {
             if (IsJumping && !JumpAvailable)
             {  
-                float JumpForce = (ParentMap.MapEnvironment.Gravity * JumpProgress) * delta;
+                float JumpForce = (World.MapEnvironment.Gravity * JumpProgress) * delta;
                 
                 UpdateArea();
                 Rectangle FixedArea = new Rectangle(Area.X, Area.Y - 1, Area.Width, Area.Height);
                 Rectangle FixedAreaLeft = new Rectangle(Area.X - 15, Area.Y - 1, Area.Width, Area.Height);
                 Rectangle FixedAreaRight = new Rectangle(Area.X + 15, Area.Y - 1, Area.Width, Area.Height);
                 
-                MapTile FixedTopTile = ParentMap.GetTile(ParentMap.GetTilePosition(new Vector2(FixedArea.X, FixedArea.Y)));
-                MapTile FixedTopLeft = ParentMap.GetTile(ParentMap.GetTilePosition(new Vector2(FixedAreaLeft.X, FixedAreaLeft.Y)));
-                MapTile FixedTopRight = ParentMap.GetTile(ParentMap.GetTilePosition(new Vector2(FixedAreaRight.X, FixedAreaRight.Y)));
+                MapTile FixedTopTile = World.GetTile(World.GetTilePosition(new Vector2(FixedArea.X, FixedArea.Y)));
+                MapTile FixedTopLeft = World.GetTile(World.GetTilePosition(new Vector2(FixedAreaLeft.X, FixedAreaLeft.Y)));
+                MapTile FixedTopRight = World.GetTile(World.GetTilePosition(new Vector2(FixedAreaRight.X, FixedAreaRight.Y)));
  
-                if (FixedTopTile.GetArea().Intersects(FixedArea) && FixedTopTile.IsColideable ||
-                    FixedTopLeft.GetArea().Intersects(FixedAreaLeft) && FixedTopLeft.IsColideable ||
-                    FixedTopRight.GetArea().Intersects(FixedAreaRight) && FixedTopRight.IsColideable)
+                if (FixedTopTile.GetArea().Intersects(FixedArea) && FixedTopTile.TileInformation.IsColideable ||
+                    FixedTopLeft.GetArea().Intersects(FixedAreaLeft) && FixedTopLeft.TileInformation.IsColideable ||
+                    FixedTopRight.GetArea().Intersects(FixedAreaRight) && FixedTopRight.TileInformation.IsColideable)
                 {
                     //Position.Y += JumpForce;
                     UpdateArea();
@@ -477,7 +477,7 @@ namespace Waxer.GameLogic
                     JumpProgress = JumpMultiplier;
                 }
 
-                Position.Y -= (ParentMap.MapEnvironment.Gravity * JumpProgress) * delta;
+                Position.Y -= (World.MapEnvironment.Gravity * JumpProgress) * delta;
                 UpdateArea();
                 GetTilesAround(); 
                 UpdateMoveSpeed(delta);
@@ -508,6 +508,9 @@ namespace Waxer.GameLogic
         //
         internal void UpdateChracter(float delta)
         {
+            if (Position.X < 0) { Position.X = 0; UpdateArea(); }
+            if (Position.Y < 0) { Position.Y = 0; UpdateArea(); }
+            
             if (BlendColor.G < 255)
             {
                 BlendColor.G += Convert.ToByte((2f * delta * 255));
@@ -518,7 +521,7 @@ namespace Waxer.GameLogic
                 BlendColor.B += Convert.ToByte((2f * delta * 255));
             }            
             
-            AimVector = -(Position - (MouseInput.PositionVector2 - ParentMap.camera.CameraPosition));
+            AimVector = -(Position - (MouseInput.PositionVector2 - World.Camera.CameraPosition));
 
 
             GetTilesAround();
@@ -531,28 +534,6 @@ namespace Waxer.GameLogic
             
             CheckPlayerStuck();
             UpdateJump(delta);
-
-            if (TileUnderCursor != null)
-            {
-                Rectangle FixedArea = new Rectangle(TileUnderCursor.GetArea().X + (int)ParentMap.camera.CameraPosition.X,
-                    TileUnderCursor.GetArea().Y + (int)ParentMap.camera.CameraPosition.Y, 32, 32);
-
-                if (MouseInput.Left_UpClickPos.Intersects(FixedArea))
-                {
-                    TileUnderCursor.SetTileID(0);
-                    TileUnderCursor.IsColideable = false;
-                    GetTilesAround();
-
-                }
-
-                if (MouseInput.Right_UpClickPos.Intersects(FixedArea))
-                {
-                    TileUnderCursor.SetTileID(1);
-                    TileUnderCursor.IsColideable = true;
-                    GetTilesAround();
- 
-                }
-            }
 
             LastDelta = delta;
 

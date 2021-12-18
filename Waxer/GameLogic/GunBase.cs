@@ -8,7 +8,7 @@ namespace Waxer.GameLogic
         public int Ammo;
         public int RecoilAmmount;
         public string InstanceID = Guid.NewGuid().ToString();
-        public Map ParentMap;
+        public GameWorld ParentMap;
  
         public virtual void Shoot(Vector2 Direction, Vector2 Location)
         {

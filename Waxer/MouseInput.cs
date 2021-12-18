@@ -34,7 +34,7 @@ namespace Waxer
 
              
             // Check for Left Button Up
-            if (newState.LeftButton == ButtonState.Pressed && oldState.LeftButton == ButtonState.Released)
+            if (newState.LeftButton == ButtonState.Released && oldState.LeftButton == ButtonState.Pressed)
             {
                 Left_UpClickPos = new Rectangle(newState.Position.X, newState.Position.Y, 1, 1);
             }
@@ -46,7 +46,7 @@ namespace Waxer
             }
 
             // Check for Right Button Up
-            if (newState.RightButton == ButtonState.Pressed && oldState.RightButton == ButtonState.Released)
+            if (newState.RightButton == ButtonState.Released && oldState.RightButton == ButtonState.Pressed)
             {
                 Right_UpClickPos = new Rectangle(newState.Position.X, newState.Position.Y, 1, 1);
             }

@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
+using Waxer.GameLogic.Items;
 using Waxer.GameLogic.Player.Inventory;
 using Waxer.Graphics;
 
@@ -10,30 +12,40 @@ namespace Waxer.GameLogic.Player
 {
     public class PlayerEntity : ControlableCharacter
     {
-        InventoryUI inventoryUI;
+        public int SelectedInventoryItem = 0;
+        public List<Item> Inventory = new();
+        KeyboardState oldState;
 
-        public PlayerEntity(Vector2 initialPosition, Map parentMap)
+        public PlayerEntity(Vector2 initialPosition, GameWorld parentMap)
         {
             Position = initialPosition;
-            ParentMap = parentMap;
+            World = parentMap;
  
             // Set SpriteOrigin to Bottom Center
             SpriteOrigin = new Vector2(16, 0);
 
-            // Create the InventoryUI Element
-            inventoryUI = new InventoryUI();
+            Inventory.Add(new Shovel(World));
 
             Texture = Sprites.MissingTexture;
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            // Draw Player Sprite
             base.Draw(spriteBatch);
             
             spriteBatch.End();
             spriteBatch.Begin();
-            
-            inventoryUI.Draw(spriteBatch);
+
+            if (SelectedInventoryItem < Inventory.Count)
+            {
+                Item selectedItem = Inventory[SelectedInventoryItem];
+                
+                if (selectedItem != null)
+                {
+                    selectedItem.Draw(spriteBatch);
+                }
+            }
 
         }
 
@@ -44,15 +56,139 @@ namespace Waxer.GameLogic.Player
             BlendColor.R = 255;
             BlendColor.G = 0;
             BlendColor.B = 0;
- 
         }
-  
+
+        void DeactivateSelectedItem()
+        {
+            if (SelectedInventoryItem < Inventory.Count)
+            {
+                Item selectedItem = Inventory[SelectedInventoryItem];
+                    
+                if (selectedItem != null)
+                { 
+                    selectedItem.Deactivate();
+                }
+            }
+        }
+
+        void UpdateInventorySelectedItemSlot()
+        {
+            KeyboardState newState = Keyboard.GetState();
+
+            if (Utils.CheckKeyUp(oldState, newState, Keys.D1))
+            {
+                if (SelectedInventoryItem != 0) { DeactivateSelectedItem(); }
+                SelectedInventoryItem = 0;
+            }
+
+            if (Utils.CheckKeyUp(oldState, newState, Keys.D2))
+            {
+                if (SelectedInventoryItem != 1) { DeactivateSelectedItem(); }
+                SelectedInventoryItem = 1;
+            }
+
+            if (Utils.CheckKeyUp(oldState, newState, Keys.D3))
+            {
+                if (SelectedInventoryItem != 2) { DeactivateSelectedItem(); }
+                SelectedInventoryItem = 2;
+            }
+
+            if (Utils.CheckKeyUp(oldState, newState, Keys.D4))
+            {
+                if (SelectedInventoryItem != 3) { DeactivateSelectedItem(); }
+                SelectedInventoryItem = 3;
+            }
+
+            if (Utils.CheckKeyUp(oldState, newState, Keys.D5))
+            {
+                if (SelectedInventoryItem != 4) { DeactivateSelectedItem(); }
+                SelectedInventoryItem = 4;
+            }
+
+            if (Utils.CheckKeyUp(oldState, newState, Keys.D6))
+            {
+                if (SelectedInventoryItem != 5) { DeactivateSelectedItem(); }
+                SelectedInventoryItem = 5;
+            }
+
+            if (Utils.CheckKeyUp(oldState, newState, Keys.D7))
+            {
+                if (SelectedInventoryItem != 6) { DeactivateSelectedItem(); }
+                SelectedInventoryItem = 6;
+            }
+
+            if (Utils.CheckKeyUp(oldState, newState, Keys.D8))
+            {
+                if (SelectedInventoryItem != 7) { DeactivateSelectedItem(); }
+                SelectedInventoryItem = 7;
+            }
+
+            if (Utils.CheckKeyUp(oldState, newState, Keys.D9))
+            {
+                if (SelectedInventoryItem != 8) { DeactivateSelectedItem(); }
+                SelectedInventoryItem = 8;
+            }
+
+            if (Utils.CheckKeyUp(oldState, newState, Keys.D0))
+            {
+                if (SelectedInventoryItem != 9) { DeactivateSelectedItem(); }
+                SelectedInventoryItem = 9;
+            }
+
+            oldState = newState;
+        }
 
         public override void Update(float delta)
         {
             base.Update(delta);
 
+            // Update controlable character logic
             UpdateChracter(delta);
+
+            // Update Inventory Slot Selection
+            UpdateInventorySelectedItemSlot();
+
+            // Update selected item
+            if (SelectedInventoryItem < Inventory.Count)
+            {
+                Item selectedItem = Inventory[SelectedInventoryItem];
+                    
+                if (selectedItem != null)
+                { 
+                    if (TileUnderCursor != null)
+                    {
+                        Rectangle FixedArea = new Rectangle(TileUnderCursor.GetArea().X + (int)World.Camera.CameraPosition.X,
+                            TileUnderCursor.GetArea().Y + (int)World.Camera.CameraPosition.Y, 32, 32);
+
+                        if (MouseInput.Left_UpClickPos.Intersects(FixedArea))
+                        {
+                            selectedItem.DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Left_Up, MouseInput.PositionVector2, World));
+                        }
+
+                        if (MouseInput.Right_UpClickPos.Intersects(FixedArea))
+                        {
+                            selectedItem.DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Right_Up, MouseInput.PositionVector2, World));
+                        }
+
+                        if (MouseInput.Left_DownClickPos.Intersects(FixedArea))
+                        {
+                            selectedItem.DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Left_Down, MouseInput.PositionVector2, World));
+                        }
+
+                        if (MouseInput.Right_DownClickPos.Intersects(FixedArea))
+                        {
+                            selectedItem.DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Right_Down, MouseInput.PositionVector2, World));
+                        }
+                        
+                    }
+
+                    selectedItem.Update(delta);
+                }
+            }
+
+
+            
+
         }
     }
 }
