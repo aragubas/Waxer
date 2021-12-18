@@ -6,7 +6,7 @@ using MonoGame.Extended;
 
 namespace Waxer.GameLogic
 {
-    public abstract class ControlableCharacter : MapEntity
+    public abstract class ControlableCharacter : WorldEntity
     {
         public float MoveSpeed = 64f;
         public float MinimumSpeed = 64f;

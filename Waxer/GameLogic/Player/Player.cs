@@ -24,7 +24,7 @@ namespace Waxer.GameLogic.Player
             // Set SpriteOrigin to Bottom Center
             SpriteOrigin = new Vector2(16, 0);
 
-            Inventory.Add(new Shovel(World));
+            Inventory.Add(new Shovel(World, 0));
 
             Texture = Sprites.MissingTexture;
         }
@@ -37,13 +37,12 @@ namespace Waxer.GameLogic.Player
             spriteBatch.End();
             spriteBatch.Begin();
 
-            if (SelectedInventoryItem < Inventory.Count)
+            // Draw selected item
+            for(int i = 0; i < Inventory.Count; i++)
             {
-                Item selectedItem = Inventory[SelectedInventoryItem];
-                
-                if (selectedItem != null)
+                if (Inventory[i].InventoryIndex == SelectedInventoryItem)
                 {
-                    selectedItem.Draw(spriteBatch);
+                    Inventory[i].Draw(spriteBatch);
                 }
             }
 
@@ -60,20 +59,40 @@ namespace Waxer.GameLogic.Player
 
         void DeactivateSelectedItem()
         {
-            if (SelectedInventoryItem < Inventory.Count)
+            for(int i = 0; i < Inventory.Count; i++)
             {
-                Item selectedItem = Inventory[SelectedInventoryItem];
-                    
-                if (selectedItem != null)
-                { 
-                    selectedItem.Deactivate();
+                if (Inventory[i].InventoryIndex == SelectedInventoryItem)
+                {
+                    Inventory[i].Deactivate();                     
                 }
             }
         }
 
+        int LastScrollValue = 0;
         void UpdateInventorySelectedItemSlot()
         {
             KeyboardState newState = Keyboard.GetState();
+            MouseState newMouseState = Mouse.GetState();
+
+
+            if (newMouseState.ScrollWheelValue - LastScrollValue >= 1)
+            {
+                DeactivateSelectedItem();
+                SelectedInventoryItem++;
+
+                if (SelectedInventoryItem > 9) { SelectedInventoryItem = 0; }
+            }
+
+            if (newMouseState.ScrollWheelValue - LastScrollValue <= -1)
+            {
+                DeactivateSelectedItem();
+                SelectedInventoryItem--;
+
+                if (SelectedInventoryItem < 0) { SelectedInventoryItem = 9; }
+            }
+
+            LastScrollValue = newMouseState.ScrollWheelValue;
+
 
             if (Utils.CheckKeyUp(oldState, newState, Keys.D1))
             {
@@ -149,12 +168,12 @@ namespace Waxer.GameLogic.Player
             UpdateInventorySelectedItemSlot();
 
             // Update selected item
-            if (SelectedInventoryItem < Inventory.Count)
+            for(int i = 0; i < Inventory.Count; i++)
             {
-                Item selectedItem = Inventory[SelectedInventoryItem];
-                    
-                if (selectedItem != null)
-                { 
+                if (Inventory[i].InventoryIndex == SelectedInventoryItem)
+                {
+                    Inventory[i].Update(delta);
+
                     if (TileUnderCursor != null)
                     {
                         Rectangle FixedArea = new Rectangle(TileUnderCursor.GetArea().X + (int)World.Camera.CameraPosition.X,
@@ -162,32 +181,28 @@ namespace Waxer.GameLogic.Player
 
                         if (MouseInput.Left_UpClickPos.Intersects(FixedArea))
                         {
-                            selectedItem.DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Left_Up, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Left_Up, MouseInput.PositionVector2, World));
                         }
 
                         if (MouseInput.Right_UpClickPos.Intersects(FixedArea))
                         {
-                            selectedItem.DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Right_Up, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Right_Up, MouseInput.PositionVector2, World));
                         }
 
                         if (MouseInput.Left_DownClickPos.Intersects(FixedArea))
                         {
-                            selectedItem.DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Left_Down, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Left_Down, MouseInput.PositionVector2, World));
                         }
 
                         if (MouseInput.Right_DownClickPos.Intersects(FixedArea))
                         {
-                            selectedItem.DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Right_Down, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Right_Down, MouseInput.PositionVector2, World));
                         }
                         
                     }
-
-                    selectedItem.Update(delta);
                 }
-            }
 
-
-            
+            }            
 
         }
     }

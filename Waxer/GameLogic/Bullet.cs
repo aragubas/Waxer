@@ -5,7 +5,7 @@ using MonoGame.Extended;
 
 namespace Waxer.GameLogic
 {
-    public class Bullet : MapEntity
+    public class Bullet : WorldEntity
     {
         float Timer = 0;
         public int Timespan = 3;

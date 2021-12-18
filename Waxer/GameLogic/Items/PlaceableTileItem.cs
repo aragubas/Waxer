@@ -8,10 +8,10 @@ namespace Waxer.GameLogic.Items
     {
         public TileInfo PlaceableTileInfo;
 
-        public PlaceableTileItem(GameWorld World, TileInfo TileInfo) : base(World)
+        public PlaceableTileItem(GameWorld World, TileInfo TileInfo) : base(World, -1)
         { 
             PlaceableTileInfo = TileInfo;
-            StackSize = 16; 
+            StackSize = 2; 
             IconTexture = TileInfo.Texture;
             Name = $"{TileInfo.Name} (Placeable)";
         }

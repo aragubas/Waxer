@@ -45,12 +45,14 @@ namespace Waxer.GameLogic
         public GameWorld World;
         public int Stack = 1; 
         public string ID = Guid.NewGuid().ToString();
+        public int InventoryIndex = -1;
 
         public Texture2D IconTexture; 
 
-        public Item(GameWorld World)
+        public Item(GameWorld World, int InventoryIndex)
         {
             this.World = World;
+            this.InventoryIndex = InventoryIndex;
         }
 
         public virtual void DoAction(ItemUseContext context)
@@ -68,7 +70,7 @@ namespace Waxer.GameLogic
             }
         }
 
-        public bool IncreaseQuantity(int HowMuch = 1)
+        public bool IncreaseStack(int HowMuch = 1)
         {
             if (Stack + HowMuch <= StackSize) { Stack += HowMuch; return true; };
             return false;
@@ -76,7 +78,7 @@ namespace Waxer.GameLogic
  
         public virtual void Update(float delta)
         {
-            
+
         }
 
         public virtual void Deactivate()

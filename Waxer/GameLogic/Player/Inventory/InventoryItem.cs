@@ -9,19 +9,20 @@ namespace Waxer.GameLogic.Player.Inventory
 {    
     public class InventoryItem : Control
     {
-        readonly int index;
+        public readonly int Index;
         readonly InventoryUI parentInventoryUI;
         bool Selected = false;
         Dictionary<int, ColorFlasher> colorValues = new Dictionary<int, ColorFlasher>();
-        public Item item;
         string LastItemID;
+        int RowPos = 0;
 
-        public InventoryItem(int Index, InventoryUI ParentInventoryUI)
+        public InventoryItem(int Index, int X, int Y, InventoryUI ParentInventoryUI)
         {
-            this.index = Index;
+            this.Index = Index;
             this.parentInventoryUI = ParentInventoryUI;
 
-            Area = new Rectangle(2 + index * 40, 2, 38, 38);
+            Area = new Rectangle(2 + X * 40, 2 + Y * 40, 38, 38);
+            RowPos = Area.Y;
 
             for(int i = 0; i < 3; i++)
             {
@@ -36,33 +37,37 @@ namespace Waxer.GameLogic.Player.Inventory
             base.Draw(spriteBatch);
 
             DrawBackground(spriteBatch);
- 
-            if (index < parentInventoryUI.player.Inventory.Count)
+
+            foreach(Item item in parentInventoryUI.player.Inventory)
             {
-                item = parentInventoryUI.player.Inventory[index];
-
-                if (item != null)
+                if (item.InventoryIndex == Index)
                 {
-                    spriteBatch.Draw(item.IconTexture, new Rectangle(Area.X, Area.Y, 38, 38), BackgroundColor);
-
+                    spriteBatch.Draw(item.IconTexture, new Rectangle(Area.X, Area.Y, 38, 38), BackgroundColor);                    
                 }
             }
+            
         }
 
         public override void Update(float delta)
         {
             base.Update(delta);
 
-            Selected = parentInventoryUI.player.SelectedInventoryItem == index;
-            
-            if (item != null)
+            Selected = parentInventoryUI.player.SelectedInventoryItem == Index;
+
+            // Check if index is in range with player inventory
+            for(int i = 0; i < parentInventoryUI.player.Inventory.Count; i++)
             {
-                if (item.Stack <= 0) 
+                if (parentInventoryUI.player.Inventory[i].InventoryIndex == Index)
                 {
-                    item.Dispose();
-                    item = null;
+                    // If item stack is less than or equal to zero, dispose item
+                    if (parentInventoryUI.player.Inventory[i].Stack <= 0) 
+                    {
+                        parentInventoryUI.player.Inventory[i].Dispose(); 
+                    }
+                    
                 }
             }
+
 
             foreach(ColorFlasher flasher in colorValues.Values)
             {
@@ -84,10 +89,11 @@ namespace Waxer.GameLogic.Player.Inventory
 
             if (Selected) 
             { 
-                Area.Y = 4; 
+                Area.Y = RowPos + 2;
+
             } else 
             { 
-                Area.Y = 2; 
+                Area.Y = RowPos; 
             }
 
             BackgroundColor.R = colorValues[0].GetColor();

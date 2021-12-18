@@ -14,14 +14,15 @@ namespace Waxer.GameLogic.Items
         bool RightSide = true;
 
 
-        public Shovel(GameWorld World) : base(World)
+        public Shovel(GameWorld World, int InventoryIndex) : base(World, InventoryIndex)
         {
             this.World = World;
             IconTexture = Graphics.Sprites.GetSprite("/items/shovel.png");
             IngameTexture = Graphics.Sprites.GetSprite("/items/ingame/shovel.png");
             StackSize = 8;
             Name = "Shovel";
-        }
+            Description = "Dig... dig... dig...";
+        } 
 
         public override void DoAction(ItemUseContext context)
         {
@@ -34,29 +35,11 @@ namespace Waxer.GameLogic.Items
                     MapTile tile = context.World.GetTile(context.World.GetTilePosition(context.MousePosition - context.World.Camera.CameraPosition));
                     
                     if (tile != null)
-                    {
+                    { 
                         if (tile.TileInformation.IsColideable)
                         {
-                            bool QuantityIncreased = false;
-
-                            foreach(Item item in World.Player.Inventory)
-                            {
-                                if (item.GetType() == typeof(PlaceableTileItem))
-                                {
-                                    PlaceableTileItem convertedItem = (PlaceableTileItem)item;
-                                     
-                                    // A item placeable tile item has been found with the same TileID, increase quantity
-                                    if (convertedItem.PlaceableTileInfo.TileID == tile.TileInformation.TileID)
-                                    {
-                                        QuantityIncreased = convertedItem.IncreaseQuantity(1);
-                                    }
-                                }
-                            }
-
-                            if (!QuantityIncreased)
-                            {
-                                World.Player.Inventory.Add(new PlaceableTileItem(World, tile.TileInformation));
-                            }
+                            PlaceableTileItem tileItem = new PlaceableTileItem(World, tile.TileInformation);
+                            World.Entities.Add(new PickableItem(World, tileItem, context.UseWorldPosition * 32)); 
 
                             context.World.SetTile(tile.TilePosition, TilesInfo.TileInfos[0]);
                             SetUpUseAnimation();

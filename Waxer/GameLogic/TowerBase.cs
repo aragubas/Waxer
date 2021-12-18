@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Waxer.GameLogic
 {
-    public abstract class TowerBase : MapEntity
+    public abstract class TowerBase : WorldEntity
     {
 
         public override void Update(float delta)
