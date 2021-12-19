@@ -36,6 +36,8 @@ namespace Waxer.GameLogic.Player
             
             spriteBatch.End();
             spriteBatch.Begin();
+            
+            base.DrawDebug(spriteBatch);
 
             // Draw selected item
             for(int i = 0; i < Inventory.Count; i++)

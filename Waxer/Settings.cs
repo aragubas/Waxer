@@ -18,8 +18,8 @@ namespace Waxer
         public static string ConfigPath = ContentFolder + "config\\";
         
         // Debug options
-        public static bool Debug_RenderColidersTiles = false;
-        public static bool Debug_RenderPlayerPositionPoints = false;
+        public static bool Debug_RenderColidersTiles = true;
+        public static bool Debug_RenderPlayerPositionPoints = true;
         public static bool Debug_RenderItemsRangeBox = true;
         
 
