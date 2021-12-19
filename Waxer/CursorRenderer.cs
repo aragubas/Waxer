@@ -18,9 +18,8 @@ namespace Waxer
         {
             spriteBatch.Begin();
             
-            spriteBatch.Draw(cursorTexure, new Vector2(MouseInput.Position.X, MouseInput.Position.Y), Color.White);
- 
-
+            spriteBatch.Draw(cursorTexure, MouseInput.PositionVector2, Color.White);
+  
             spriteBatch.End();
         }
 

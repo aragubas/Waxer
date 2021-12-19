@@ -72,7 +72,8 @@ namespace Waxer.GameLogic
 
         public bool IncreaseStack(int HowMuch = 1)
         {
-            if (Stack + HowMuch <= StackSize) { Stack += HowMuch; return true; };
+            if (HowMuch <= 0) { return false; }
+            if ((Stack + HowMuch) <= StackSize) { Stack += HowMuch; return true; };
             return false;
         } 
  

@@ -27,6 +27,7 @@ namespace Waxer
         public List<WorldEntity> Entities = new List<WorldEntity>();
         public EnvironmentSettings MapEnvironment = new EnvironmentSettings();
         public SpriteFont DebugFont;
+        public Vector2 DebugFontSize;
         public Dictionary<Vector2, Chunk> chunks = new();
         InventoryUI inventoryUI;
 
@@ -51,6 +52,7 @@ namespace Waxer
             if (DebugFont == null) 
             {
                 DebugFont = Graphics.Fonts.GetSpriteFont(Graphics.Fonts.GetFontDescriptor("/PressStart2P", 8, spriteBatch.GraphicsDevice));
+                DebugFontSize = DebugFont.MeasureString("H"); 
             }
 
             spriteBatch.Begin(transformMatrix: Camera.GetMatrix());

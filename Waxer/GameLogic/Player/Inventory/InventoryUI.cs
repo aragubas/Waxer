@@ -19,7 +19,10 @@ namespace Waxer.GameLogic.Player.Inventory
         KeyboardState oldState;
         ValueSmoother valueSmooth;
         bool MulitpleRowsVisible = false;
-        int MultipleRowsInventorySelectedItem = -1;
+        int MultipleRows_InventorySelectedItem = -1;
+        int MultipleRows_InventoryItemBeingHovered = -1;
+        InventoryTooltip tooltip;
+        int MultipleRows_ItemsBeingHovered = 0;
 
         public InventoryUI(PlayerEntity PlayerInstance)
         {
@@ -30,12 +33,12 @@ namespace Waxer.GameLogic.Player.Inventory
             this.player = PlayerInstance;
             int Row = 0;
             int Col = -1;
-
+  
             for(int i = 0; i < 30; i++)
-            {
+            { 
                 Col++;
 
-                if (Col > 10)
+                if (Col > 9)
                 {
                     Col = 0;
                     Row++;
@@ -47,6 +50,7 @@ namespace Waxer.GameLogic.Player.Inventory
             Area.Height = 4;
 
             valueSmooth = new ValueSmoother(250, OneRowHeight, 4);
+            tooltip = new InventoryTooltip(PlayerInstance);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -67,7 +71,7 @@ namespace Waxer.GameLogic.Player.Inventory
 
             for(int i = 0; i < NumberRowsToDraw; i++)
             {  
-                if (items[i].Index == MultipleRowsInventorySelectedItem && MulitpleRowsVisible)
+                if (items[i].Index == MultipleRows_InventorySelectedItem && MulitpleRowsVisible)
                 {
                     // Draw red square on its original position
                     spriteBatch.DrawRectangle(items[i].Area, Color.White);
@@ -86,9 +90,6 @@ namespace Waxer.GameLogic.Player.Inventory
 
                 }
             }
-
-            spriteBatch.DrawString(player.World.DebugFont, NumberRowsToDraw.ToString(), new Vector2(0, 0), Color.Red);
-
 
             spriteBatch.End();
 
@@ -109,24 +110,30 @@ namespace Waxer.GameLogic.Player.Inventory
   
                     spriteBatch.DrawString(player.World.DebugFont, ItemInfosString, new Vector2(Area.X, Area.Y + Area.Height + 8), Color.Red);
 
-                }                
+                }
             }
 
             spriteBatch.End();
 
+            if (MulitpleRowsVisible)
+            {
+                tooltip.Draw(spriteBatch); 
+            } 
+            
         }
 
         void ExitFullInventory()
         {
-            MultipleRowsInventorySelectedItem = -1;
+            MultipleRows_InventorySelectedItem = -1;
             MulitpleRowsVisible = false;
             valueSmooth.TargetValue = OneRowHeight;
-
+            tooltip.ResetAnimation();
+            
         }
 
         void EnterFullInventory()
         {
-            MultipleRowsInventorySelectedItem = -1;
+            MultipleRows_InventorySelectedItem = -1;
             MulitpleRowsVisible = true;
             valueSmooth.TargetValue = AllRowsHeight;
 
@@ -160,15 +167,15 @@ namespace Waxer.GameLogic.Player.Inventory
                 if (MouseInput.Left_UpClickPos.Intersects(FixedArea))
                 {
                     // Clicked on the same place
-                    if (MultipleRowsInventorySelectedItem == item.Index)
+                    if (MultipleRows_InventorySelectedItem == item.Index)
                     {
                         // Remove selection
-                        MultipleRowsInventorySelectedItem = -1;     
+                        MultipleRows_InventorySelectedItem = -1;     
                         return;
                          
                     }else // User is trying to move something to something
                     {
-                        if (MultipleRowsInventorySelectedItem != -1) // Clicked on an item and then in another one
+                        if (MultipleRows_InventorySelectedItem != -1) // Clicked on an item and then in another one
                         {
                             int item2Index = -1;
                             int item1Index = -1;
@@ -177,7 +184,7 @@ namespace Waxer.GameLogic.Player.Inventory
                             {
                                 if (item2Index != -1 && item1Index != -1) { break; }
 
-                                if (player.Inventory[i].InventoryIndex == MultipleRowsInventorySelectedItem)
+                                if (player.Inventory[i].InventoryIndex == MultipleRows_InventorySelectedItem)
                                 { 
                                     item1Index = i; 
                                     continue;
@@ -197,53 +204,36 @@ namespace Waxer.GameLogic.Player.Inventory
                             // Item 1 and two exists, move operation will happen
                             if (item2Index != -1)
                             {                                
-                                // Both items are the same type, try to combine them 
-                                if (player.Inventory[item2Index].GetType() == player.Inventory[item1Index].GetType())
-                                {
-                                    // Items can combine, destroy instance of item2
-                                    if (player.Inventory[item1Index].IncreaseStack(player.Inventory[item2Index].Stack))
-                                    {
-                                        player.Inventory[item2Index].Dispose(); 
-                                    } 
-                                    else
-                                    {
-                                        // Switch places if can't combine items
-                                        player.Inventory[item1Index].InventoryIndex = player.Inventory[item2Index].InventoryIndex;
-                                        player.Inventory[item2Index].InventoryIndex = MultipleRowsInventorySelectedItem;
+                                // Switch places
+                                player.Inventory[item1Index].InventoryIndex = player.Inventory[item2Index].InventoryIndex;
+                                player.Inventory[item2Index].InventoryIndex = MultipleRows_InventorySelectedItem;
 
-                                    }
-                                }else
-                                {
-                                    // Switch places if incompatible
-                                    player.Inventory[item1Index].InventoryIndex = player.Inventory[item2Index].InventoryIndex;
-                                    player.Inventory[item2Index].InventoryIndex = MultipleRowsInventorySelectedItem;
-
-                                }
-
-                                MultipleRowsInventorySelectedItem = -1;
-                                
-                                Console.WriteLine($"Switch Places {player.Inventory[item1Index].InventoryIndex} with {player.Inventory[item2Index].InventoryIndex}");
+                                // Deselect
+                                MultipleRows_InventorySelectedItem = -1;
 
                             }else // User clicked in a white space, move to selected white space
                             {
                                 player.Inventory[item1Index].InventoryIndex = item.Index;
-                                MultipleRowsInventorySelectedItem = -1;
-
-                                Console.WriteLine($"Switch Places White Space {player.Inventory[item1Index].InventoryIndex} with {item.Index}");
-
+                                
+                                MultipleRows_InventorySelectedItem = -1;
                             }
 
 
                         }else // User clicked on an item without any other item selected. Start move operation
                         {
-                            MultipleRowsInventorySelectedItem = item.Index;
+                            MultipleRows_InventorySelectedItem = item.Index;
 
                         }
 
                     }
-                } 
+                 
+                }else if (MouseInput.Position.Intersects(FixedArea))
+                {
+                    MultipleRows_InventoryItemBeingHovered = item.Index;
+                    MultipleRows_ItemsBeingHovered++;
+                }
             }
-
+ 
         }
 
         void UpdateInventoryItems(float delta)
@@ -254,6 +244,12 @@ namespace Waxer.GameLogic.Player.Inventory
                 UpdateInventoryPositioning(item); 
             }   
 
+            if (MultipleRows_ItemsBeingHovered < 1)
+            {
+                MultipleRows_InventoryItemBeingHovered = -1;
+            }
+             
+            MultipleRows_ItemsBeingHovered = 0;
         }
 
         public override void Update(float delta)
@@ -264,6 +260,19 @@ namespace Waxer.GameLogic.Player.Inventory
 
             FullInventoryToggleKey();
             UpdateInventoryItems(delta);
+ 
+            if (MulitpleRowsVisible) 
+            {
+                if (MultipleRows_InventoryItemBeingHovered < items.Count && MultipleRows_InventoryItemBeingHovered >= 0)
+                {
+                    tooltip.SelectedInventoryItem = items[MultipleRows_InventoryItemBeingHovered];
+                }else
+                {
+                    tooltip.SelectedInventoryItem = null;
+                }
+
+                tooltip.Update(delta);
+            }
 
         }
     }

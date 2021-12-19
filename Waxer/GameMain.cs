@@ -58,10 +58,11 @@ namespace Waxer
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-
-            // Draw the game map
+ 
+            // Draw the game map and entities
             gameMap.Draw(spriteBatch);
-
+ 
+            // Draw mouse cursor
 			cursorRender.Draw(spriteBatch);
         }
 

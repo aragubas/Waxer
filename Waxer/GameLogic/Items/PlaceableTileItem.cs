@@ -11,7 +11,7 @@ namespace Waxer.GameLogic.Items
         public PlaceableTileItem(GameWorld World, TileInfo TileInfo) : base(World, -1)
         { 
             PlaceableTileInfo = TileInfo;
-            StackSize = 2; 
+            StackSize = 8; 
             IconTexture = TileInfo.Texture;
             Name = $"{TileInfo.Name} (Placeable)";
         }

@@ -20,6 +20,7 @@ namespace Waxer.Graphics
         public static float SmallFontSize = 8;
         public static float TyneFontSize = 7.8f;
         public static float DefaultFontSize = 10;
+        public static SpriteFont DefaultFont;
 
         public static SpriteFont BakeFont(string FontName, float FontSize, GraphicsDevice graphDev)
         {
@@ -62,6 +63,11 @@ namespace Waxer.Graphics
             FontDescriptor ceira = new FontDescriptor(FontName, FontSize);
             LoadedFonts.Add(ceira, BakeFont(FontName, FontSize, grafDev));
             return ceira;
+        }
+
+        public static void LoadDefaultFont()
+        {
+            
         }
 
         public static SpriteFont GetSpriteFont(FontDescriptor descriptor)

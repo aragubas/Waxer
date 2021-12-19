@@ -19,6 +19,12 @@ namespace Waxer.UserInterface
             spriteBatch.DrawRectangle(Area, Color.FromNonPremultiplied(BackgroundColor.R + 64, BackgroundColor.G + 64, BackgroundColor.B + 64, Opacity - 64));
         }
 
+        internal void DrawBackgroundRelativeCords(SpriteBatch spriteBatch)
+        {
+            spriteBatch.FillRectangle(new Rectangle(0, 0, Area.Width, Area.Height), Color.FromNonPremultiplied(BackgroundColor.R, BackgroundColor.G, BackgroundColor.B, Opacity - 180));
+            spriteBatch.DrawRectangle(new Rectangle(0, 0, Area.Width, Area.Height), Color.FromNonPremultiplied(BackgroundColor.R + 64, BackgroundColor.G + 64, BackgroundColor.B + 64, Opacity - 64));
+        }
+
         public virtual void Draw(SpriteBatch spriteBatch)
         {
             

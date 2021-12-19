@@ -10,12 +10,12 @@ namespace Waxer.GameLogic.Player.Inventory
     public class InventoryItem : Control
     {
         public readonly int Index;
-        readonly InventoryUI parentInventoryUI;
+        public readonly InventoryUI parentInventoryUI;
         bool Selected = false;
         Dictionary<int, ColorFlasher> colorValues = new Dictionary<int, ColorFlasher>();
         string LastItemID;
         int RowPos = 0;
-
+ 
         public InventoryItem(int Index, int X, int Y, InventoryUI ParentInventoryUI)
         {
             this.Index = Index;
@@ -46,7 +46,7 @@ namespace Waxer.GameLogic.Player.Inventory
                 }
             }
             
-        }
+        } 
 
         public override void Update(float delta)
         {
@@ -76,12 +76,12 @@ namespace Waxer.GameLogic.Player.Inventory
                 if (Selected)
                 {
                     flasher.Speed = 255;
-                    flasher.MinimunValue = 100;
+                    flasher.MinimunValue = 150;
 
                 }else 
                 { 
                     flasher.Speed = 510; 
-                    flasher.MinimunValue = 50;
+                    flasher.MinimunValue = 100;
                 }
 
                 flasher.Update(delta);

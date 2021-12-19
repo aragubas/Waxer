@@ -157,6 +157,12 @@ namespace Waxer.GameLogic.Player
             oldState = newState;
         }
 
+        public bool InventoryItemExists(int Index)
+        {
+            Item itemFound = Inventory.Find(item => item.InventoryIndex == Index);
+            return itemFound != null;
+        }
+
         public override void Update(float delta)
         {
             base.Update(delta);
