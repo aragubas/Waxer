@@ -22,6 +22,8 @@ namespace Waxer
         public static bool Debug_RenderPlayerPositionPoints = true;
         public static bool Debug_RenderItemsRangeBox = true;
         
+        //Physics
+        public static float Physics_StableDelta = 0.015f;
 
     }
 }

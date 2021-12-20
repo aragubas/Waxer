@@ -19,7 +19,8 @@ namespace Waxer
 
             IsFixedTimeStep = false;
             //TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 60);
-
+ 
+            // Make sure its running with VSync
             graphics.SynchronizeWithVerticalRetrace = true;
             graphics.ApplyChanges();
 
@@ -51,7 +52,6 @@ namespace Waxer
             MouseInput.Update();
 
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (delta > 0.017) { delta = 0.017f; }
 
             gameMap.Update(delta);
         }

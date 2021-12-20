@@ -286,10 +286,16 @@ namespace Waxer.GameLogic
             AimVector = -(Position - (MouseInput.PositionVector2 - World.Camera.CameraPosition));
 
             GetTilesAround(Position);
-  
+
             UpdateInput();
+            float oldDelta = delta;
+            
+            // Limit delta to a stable value
+            if (delta > Settings.Physics_StableDelta) { delta = Settings.Physics_StableDelta; }
             UpdateMoveSpeed(delta);
             UpdateAppliedForces(delta);
+
+            delta = oldDelta;
 
             LastDelta = delta;
 
