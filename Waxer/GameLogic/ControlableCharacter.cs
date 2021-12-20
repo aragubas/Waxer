@@ -19,6 +19,7 @@ namespace Waxer.GameLogic
         internal bool IsJumping = false;
         internal bool JumpAvailable = true;
         internal float JumpProgress = 0f;
+        internal float JumpVelocity = 0f; 
         internal MapTile TileUnderCursor = null;         
         internal MapTile TileBehind = null;
         internal MapTile TileRight = null;
@@ -29,7 +30,11 @@ namespace Waxer.GameLogic
         internal MapTile TileTopRight = null;
         internal MapTile TileBottomLeft = null;
         internal MapTile TileBottomRight = null;
-        
+        internal MapTile SinasTile = null;
+        internal Rectangle SinasRect = Rectangle.Empty; 
+        internal MapTile CeiraTile = null;
+        internal Rectangle CeiraRect = Rectangle.Empty; 
+ 
         internal float LastDelta = 0.0f;
 
         #region DEBUG AREA
@@ -61,11 +66,12 @@ namespace Waxer.GameLogic
             // Draw all the surronding colision check tiles
             if (Settings.Debug_RenderColidersTiles)
             {
+                /*
                 if (TileBehind != null)
                 {
                     RenderTileInfos(spriteBatch, TileBehind, "BEHI");
                 }
-                            
+                 
                 if (TileBottom != null)
                 {
                     RenderTileInfos(spriteBatch, TileBottom, "BOTT");
@@ -105,6 +111,20 @@ namespace Waxer.GameLogic
                 {
                     RenderTileInfos(spriteBatch, TileBottomRight, "BOTR");
                 }
+                 
+                if (SinasTile != null)
+                {
+                    spriteBatch.FillRectangle(new Rectangle(SinasRect.X + (int)World.Camera.CameraPosition.X, SinasRect.Y + (int)World.Camera.CameraPosition.Y, SinasRect.Width, SinasRect.Height), Color.Yellow); 
+                    RenderTileInfos(spriteBatch, SinasTile, "LEFT");
+                }
+                
+                if (CeiraTile != null)
+                {
+                    spriteBatch.FillRectangle(new Rectangle(CeiraRect.X + (int)World.Camera.CameraPosition.X, CeiraRect.Y + (int)World.Camera.CameraPosition.Y, CeiraRect.Width, CeiraRect.Height), Color.Orange); 
+                    RenderTileInfos(spriteBatch, CeiraTile, "RIGH");
+                }
+                */
+
 
             }
 
@@ -208,14 +228,19 @@ namespace Waxer.GameLogic
 
             if (Utils.CheckKeyDown(oldState, newState, Keys.A))
             {
-                NextPos.X -= 1f;
+                NextPos.X = -1f;
+            }
+ 
+            if (Utils.CheckKeyUp(oldState, newState, Keys.F1))
+            {
+                MoveSpeed = 64;
             }
 
             if (Utils.CheckKeyDown(oldState, newState, Keys.LeftShift))
             {
                 MoveSpeed *= Acceleration;
             }
- 
+
             Force = NextPos;
 
             oldState = newState;
@@ -226,10 +251,12 @@ namespace Waxer.GameLogic
 
         void UpdateAppliedForces(float delta)
         {
+ 
             Force = Utils.ClampVector(Force, -1, 1); 
             Vector2 ForceMultiplied = Force * MoveSpeed;
             Vector2 NextStep = Position + (ForceMultiplied * delta);
-
+            NextStep += new Vector2(0, World.MapEnvironment.Gravity * delta);
+ 
             //GetTilesAround(NextStep);
 
             // Right colision
@@ -240,8 +267,8 @@ namespace Waxer.GameLogic
  
                 if (rightTile.TileInformation.IsColideable && rightTile.GetArea().Intersects(rightArea))
                 {
-                   NextStep = new Vector2(rightTile.GetArea().X - 16, Position.Y);
-                   Console.WriteLine($"Right Colision at iteration {i}");
+                   NextStep = new Vector2(rightTile.GetArea().X - 16, NextStep.Y);
+                   Console.WriteLine($"Right colision at iteration {i}");
                    break;
                 } 
             }
@@ -252,13 +279,54 @@ namespace Waxer.GameLogic
                 MapTile leftTile = World.GetTile(World.GetTilePosition(NextStep - new Vector2(i, 0)));
                 Rectangle leftArea = new Rectangle(((int)Position.X - 16) - i, (int)Position.Y, Area.Width, Area.Height);
 
-
                 if (leftTile.TileInformation.IsColideable && leftTile.GetArea().Intersects(leftArea))
                 { 
-                   NextStep = new Vector2(leftTile.GetArea().Right + 16, Position.Y);
-                   Console.WriteLine($"Left Colision at iteration {i}");
+                   NextStep = new Vector2(leftTile.GetArea().Right + 16, NextStep.Y);
+                   Console.WriteLine($"Left colision at iteration {i}");
                    break;
                 } 
+            }
+   
+            // Bottom colision
+            for(int i = 0; i < 16; i++)
+            { 
+                // Bottom Center
+                MapTile bottomTile = World.GetTile(World.GetTilePosition(NextStep + new Vector2(0, 32 + i)));
+                Rectangle bottomArea = new Rectangle((int)Position.X, (int)Position.Y - i, Area.Width, Area.Height);
+     
+                if (bottomTile.TileInformation.IsColideable && bottomTile.GetArea().Intersects(bottomArea))
+                { 
+                   NextStep = new Vector2(NextStep.X, bottomTile.GetArea().Y - (31 - i)); 
+                   Console.WriteLine($"Bottom colision at iteration {i}");
+                   break;
+                }
+ 
+                // Bottom Left
+                MapTile bottomLeftTile = World.GetTile(World.GetTilePosition(NextStep + new Vector2(16 - i, 32 + i)));
+                Rectangle bottomLeftArea = new Rectangle(((int)Position.X - 16) + i, (int)Position.Y - i, Area.Width, Area.Height);
+
+                if (i == 0) { SinasTile = bottomLeftTile; SinasRect = bottomLeftArea; }
+ 
+                if (bottomLeftTile.TileInformation.IsColideable && bottomLeftTile.GetArea().Intersects(bottomLeftArea))
+                {   
+                   NextStep = new Vector2(NextStep.X, bottomLeftTile.GetArea().Y - (31 - i));
+                   Console.WriteLine($"Bottom Left colision at iteration {i}");
+                   break;
+                }
+ 
+                // Bottom Right
+                MapTile bottomRightTile = World.GetTile(World.GetTilePosition(NextStep + new Vector2(-(16 - i), 32 + i)));
+                Rectangle bottomRightArea = new Rectangle(((int)Position.X - 16) - i, (int)Position.Y - i, Area.Width, Area.Height);
+
+                if (i == 0) { CeiraTile = bottomRightTile; CeiraRect = bottomRightArea; }
+ 
+                if (bottomRightTile.TileInformation.IsColideable && bottomRightTile.GetArea().Intersects(bottomRightArea))
+                {
+                   NextStep = new Vector2(NextStep.X, bottomRightTile.GetArea().Y - (31 - i));
+                   Console.WriteLine($"Bottom Right colision at iteration {i}");
+                   break;
+                }
+ 
             }
             
             
@@ -289,7 +357,7 @@ namespace Waxer.GameLogic
 
             UpdateInput();
             float oldDelta = delta;
-            
+
             // Limit delta to a stable value
             if (delta > Settings.Physics_StableDelta) { delta = Settings.Physics_StableDelta; }
             UpdateMoveSpeed(delta);

@@ -23,7 +23,7 @@ namespace Waxer
         public static bool Debug_RenderItemsRangeBox = true;
         
         //Physics
-        public static float Physics_StableDelta = 0.015f;
+        public static float Physics_StableDelta = 0.017f;
 
     }
 }

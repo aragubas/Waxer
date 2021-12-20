@@ -13,7 +13,6 @@ namespace Waxer.GameLogic.Player.Inventory
         public readonly InventoryUI parentInventoryUI;
         bool Selected = false;
         Dictionary<int, ColorFlasher> colorValues = new Dictionary<int, ColorFlasher>();
-        string LastItemID;
         int RowPos = 0;
  
         public InventoryItem(int Index, int X, int Y, InventoryUI ParentInventoryUI)
