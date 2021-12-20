@@ -102,6 +102,10 @@ namespace Waxer.GameLogic
 
         internal void UpdateBody(float delta)
         {   
+            if (Position.X < 32) { Position.X = 32; UpdateArea(); }
+            if (Position.Y < 32) { Position.Y = 32; UpdateArea(); }
+            UpdateArea(); 
+
             GetTilesAround();
             UpdateGravity(delta);
 

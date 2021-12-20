@@ -51,6 +51,7 @@ namespace Waxer
             MouseInput.Update();
 
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (delta > 0.017) { delta = 0.017f; }
 
             gameMap.Update(delta);
         }

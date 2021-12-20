@@ -148,6 +148,14 @@ namespace Waxer
             spriteBatch.DrawString(font, strToDraw, position, textColor, rotation, spriteOrigin, scale, spriteEffects, spriteLayer);
         }
 
+        public static Vector2 ClampVector(Vector2 value, int min, int max)
+        {
+            Vector2 ReturnVector = Vector2.Zero;
+            ReturnVector.X = MathHelper.Clamp(value.X, min, max);
+            ReturnVector.Y = MathHelper.Clamp(value.Y, min, max);
+            return ReturnVector;
+        }
+
         /// <summary>
         /// Gets the substring.
         /// </summary>
