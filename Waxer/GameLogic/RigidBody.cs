@@ -72,7 +72,7 @@ namespace Waxer.GameLogic
                 Size = AreaSize;
             }
             
-            Rectangle FixedArea = new Rectangle(Area.X - (int)SpriteOrigin.X, Area.Y + (int)World.MapEnvironment.Gravity, (int)Size.X, (int)Size.Y);
+            Rectangle FixedArea = new Rectangle(Area.X - (int)SpriteOrigin.X, Area.Y + (int)World.WorldEnvironment.Gravity, (int)Size.X, (int)Size.Y);
 
             bool ColidingBottom = (TileBottom.GetArea().Intersects(FixedArea) && TileBottom.TileInformation.IsColideable);
             bool ColidingBottomLeft = (TileBottomLeft.GetArea().Intersects(FixedArea) && TileBottomLeft.TileInformation.IsColideable);
@@ -89,7 +89,7 @@ namespace Waxer.GameLogic
             }else  
             { 
                 // Pulls the object to the ground, to simulate gravity
-                float Force = (World.MapEnvironment.Gravity * GravityMultiplier) * delta;
+                float Force = (World.WorldEnvironment.Gravity * GravityMultiplier) * delta;
                 Position.Y += Force;
                 UpdateArea();
 

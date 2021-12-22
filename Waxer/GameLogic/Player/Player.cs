@@ -27,6 +27,7 @@ namespace Waxer.GameLogic.Player
             Inventory.Add(new Shovel(World, 0));
 
             Texture = Sprites.MissingTexture;
+
         }
 
         public override void Draw(SpriteBatch spriteBatch)

@@ -11,7 +11,7 @@ namespace Waxer.GameLogic
         public float MoveSpeed = 64f;
         public float MinimumSpeed = 64f;
         public float Acceleration = 10f;
-        public float JumpMultiplier = 8f;
+        public float JumpMultiplier = 12f;
         public int Life = 300;
         private KeyboardState oldState;
         internal Vector2 AimVector = Vector2.Zero;
@@ -19,7 +19,8 @@ namespace Waxer.GameLogic
         internal bool IsJumping = false;
         internal bool JumpAvailable = true;
         internal float JumpProgress = 0f;
-        internal float JumpVelocity = 0f; 
+        internal float JumpSpeed = 0f;
+        internal float JumpForce = 0f; 
         internal MapTile TileUnderCursor = null;         
         internal MapTile TileBehind = null;
         internal MapTile TileRight = null;
@@ -54,7 +55,6 @@ namespace Waxer.GameLogic
             // Draw tile cordinates
             spriteBatch.DrawString(World.DebugFont, $"X:{tile.TilePosition.X}\n" + 
                                                         $"Y:{tile.TilePosition.Y}\n{TileName}", FixedPosition, sinasColor);
-
         }
 
         // == DEBUG AREA ==
@@ -111,17 +111,22 @@ namespace Waxer.GameLogic
                 {
                     RenderTileInfos(spriteBatch, TileBottomRight, "BOTR");
                 }
+                */
                  
                 if (SinasTile != null)
                 {
                     spriteBatch.FillRectangle(new Rectangle(SinasRect.X + (int)World.Camera.CameraPosition.X, SinasRect.Y + (int)World.Camera.CameraPosition.Y, SinasRect.Width, SinasRect.Height), Color.Yellow); 
-                    RenderTileInfos(spriteBatch, SinasTile, "LEFT");
+                    RenderTileInfos(spriteBatch, SinasTile, "TOP");
+
+                    SinasTile = null;
+                    SinasRect = Rectangle.Empty;
                 }
-                
+                 
+                /*
                 if (CeiraTile != null)
                 {
                     spriteBatch.FillRectangle(new Rectangle(CeiraRect.X + (int)World.Camera.CameraPosition.X, CeiraRect.Y + (int)World.Camera.CameraPosition.Y, CeiraRect.Width, CeiraRect.Height), Color.Orange); 
-                    RenderTileInfos(spriteBatch, CeiraTile, "RIGH");
+                    RenderTileInfos(spriteBatch, CeiraTile, "TOP");
                 }
                 */
 
@@ -235,6 +240,14 @@ namespace Waxer.GameLogic
             {
                 MoveSpeed = 64;
             }
+ 
+            if (Utils.CheckKeyDown(oldState, newState, Keys.W) || Utils.CheckKeyDown(oldState, newState, Keys.Space))
+            {
+                if (JumpAvailable)
+                {
+                    SetUpJump();
+                }
+            }
 
             if (Utils.CheckKeyDown(oldState, newState, Keys.LeftShift))
             {
@@ -248,6 +261,83 @@ namespace Waxer.GameLogic
 
         Vector2 Force;
 
+        void PlayerHitGround()
+        {
+            GravityMultiplier = 0; 
+            EndJumping();
+
+        }
+        
+        void EndJumping()
+        {
+            IsJumping = false;
+            JumpMultiplier = 0;
+            JumpAvailable = true;
+            JumpProgress = 0;
+             
+        }
+
+        void SetUpJump()
+        {
+            IsJumping = true;
+            JumpAvailable = false;
+            JumpProgress = 12f;
+        }
+
+        void UpdateJump(float delta)
+        {
+            float Force = (World.WorldEnvironment.Gravity * JumpProgress) * delta;
+            bool IsTopColiding = false;
+
+            
+
+        }
+
+        void UpdateGravity(float delta)
+        {
+            
+            float Force = (World.WorldEnvironment.Gravity * GravityMultiplier) * delta;
+            bool isColiding = false;
+            
+            // Detect bottom colision
+            for(int i = 0; i < 16; i++)
+            {
+                Rectangle BottomArea = new Rectangle((int)Position.X, (int)Position.Y, Area.Width,Area.Height);
+                Rectangle BottomAreaRight = new Rectangle((int)Position.X + 15, (int)Position.Y, Area.Width,Area.Height);
+                Rectangle BottomAreaLeft = new Rectangle((int)Position.X - 15, (int)Position.Y, Area.Width,Area.Height);
+
+                MapTile TileBottom = World.GetTile(World.GetTilePosition(Position + new Vector2(0, 32 + i)));
+                MapTile TileBottomRight = World.GetTile(World.GetTilePosition(Position + new Vector2(15, 32 + i)));
+                MapTile TileBottomLeft = World.GetTile(World.GetTilePosition(Position + new Vector2(-15, 32 + i)));
+
+                if (TileBottom.TileInformation.IsColideable)
+                {
+                    SinasTile = TileBottom;
+                    SinasRect = BottomArea;
+                }
+
+                isColiding = TileBottom.TileInformation.IsColideable && BottomArea.Intersects(TileBottom.GetArea()) || 
+                             TileBottomLeft.TileInformation.IsColideable && BottomAreaLeft.Intersects(TileBottomLeft.GetArea()) ||
+                             TileBottomRight.TileInformation.IsColideable && BottomAreaRight.Intersects(TileBottomRight.GetArea());
+
+                if (isColiding)
+                {
+                    Position.Y = TileBottom.GetArea().Y - 31;
+                    PlayerHitGround();
+                    break;
+                }
+            }
+
+            if (!isColiding) 
+            {
+                Position.Y += Force;
+                UpdateArea();
+
+                GravityMultiplier += 16f * delta;
+            }
+
+
+        }
 
         void UpdateAppliedForces(float delta)
         {
@@ -255,10 +345,8 @@ namespace Waxer.GameLogic
             Force = Utils.ClampVector(Force, -1, 1); 
             Vector2 ForceMultiplied = Force * MoveSpeed;
             Vector2 NextStep = Position + (ForceMultiplied * delta);
-            NextStep += new Vector2(0, World.MapEnvironment.Gravity * delta);
- 
-            //GetTilesAround(NextStep);
-
+  
+  
             // Right colision
             for(int i = 0; i < 16; i++)
             {
@@ -268,11 +356,10 @@ namespace Waxer.GameLogic
                 if (rightTile.TileInformation.IsColideable && rightTile.GetArea().Intersects(rightArea))
                 {
                    NextStep = new Vector2(rightTile.GetArea().X - 16, NextStep.Y);
-                   Console.WriteLine($"Right colision at iteration {i}");
                    break;
-                } 
-            }
- 
+                }
+            } 
+
             // Left colision
             for(int i = 0; i < 16; i++)
             {
@@ -282,14 +369,38 @@ namespace Waxer.GameLogic
                 if (leftTile.TileInformation.IsColideable && leftTile.GetArea().Intersects(leftArea))
                 { 
                    NextStep = new Vector2(leftTile.GetArea().Right + 16, NextStep.Y);
-                   Console.WriteLine($"Left colision at iteration {i}");
                    break;
                 } 
             }
+
+
+            /*
+            // Top colision
+            for(int i = 0; i < 16; i++)
+            {  
+                // Top Center
+                MapTile topTile = World.GetTile(World.GetTilePosition(NextStep - new Vector2(0, i + 16)));
+                Rectangle topArea = new Rectangle((int)Position.X, (int)Position.Y - i, Area.Width, Area.Height);
+                 
+                if (i == 0)
+                {
+                    SinasTile = topTile;
+                    SinasRect = topArea;
+                }
    
+                if (topTile.TileInformation.IsColideable && topTile.GetArea().Intersects(topArea))
+                { 
+                   NextStep = new Vector2(NextStep.X, topTile.GetArea().Bottom + i); 
+                   Console.WriteLine($"Top Colision at iteration {i}");
+                   EndJumping(); 
+                   break;
+                }
+ 
+            }
+ 
             // Bottom colision
             for(int i = 0; i < 16; i++)
-            { 
+            {  
                 // Bottom Center
                 MapTile bottomTile = World.GetTile(World.GetTilePosition(NextStep + new Vector2(0, 32 + i)));
                 Rectangle bottomArea = new Rectangle((int)Position.X, (int)Position.Y - i, Area.Width, Area.Height);
@@ -297,7 +408,8 @@ namespace Waxer.GameLogic
                 if (bottomTile.TileInformation.IsColideable && bottomTile.GetArea().Intersects(bottomArea))
                 { 
                    NextStep = new Vector2(NextStep.X, bottomTile.GetArea().Y - (31 - i)); 
-                   Console.WriteLine($"Bottom colision at iteration {i}");
+                   if (IsJumping) { Console.WriteLine("Bottom Colision"); }
+                   PlayerHitGround();
                    break;
                 }
  
@@ -310,7 +422,8 @@ namespace Waxer.GameLogic
                 if (bottomLeftTile.TileInformation.IsColideable && bottomLeftTile.GetArea().Intersects(bottomLeftArea))
                 {   
                    NextStep = new Vector2(NextStep.X, bottomLeftTile.GetArea().Y - (31 - i));
-                   Console.WriteLine($"Bottom Left colision at iteration {i}");
+                   if (IsJumping) { Console.WriteLine("Bottom Left Colision"); }
+                   PlayerHitGround();
                    break;
                 }
  
@@ -323,11 +436,13 @@ namespace Waxer.GameLogic
                 if (bottomRightTile.TileInformation.IsColideable && bottomRightTile.GetArea().Intersects(bottomRightArea))
                 {
                    NextStep = new Vector2(NextStep.X, bottomRightTile.GetArea().Y - (31 - i));
-                   Console.WriteLine($"Bottom Right colision at iteration {i}");
+                   if (IsJumping) { Console.WriteLine("Bottom Right Colision"); }
+                   PlayerHitGround();
                    break;
                 }
- 
+
             }
+            */
             
             
             Position = NextStep; 
@@ -357,11 +472,14 @@ namespace Waxer.GameLogic
 
             UpdateInput();
             float oldDelta = delta;
-
+ 
             // Limit delta to a stable value
             if (delta > Settings.Physics_StableDelta) { delta = Settings.Physics_StableDelta; }
+  
             UpdateMoveSpeed(delta);
             UpdateAppliedForces(delta);
+            UpdateJump(delta);
+            UpdateGravity(delta);
 
             delta = oldDelta;
 

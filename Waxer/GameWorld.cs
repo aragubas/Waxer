@@ -25,7 +25,7 @@ namespace Waxer
         public PlayerEntity Player;
         public Camera2D Camera = new Camera2D();
         public List<WorldEntity> Entities = new List<WorldEntity>();
-        public EnvironmentSettings MapEnvironment = new EnvironmentSettings();
+        public EnvironmentSettings WorldEnvironment = new EnvironmentSettings();
         public SpriteFont DebugFont;
         public Vector2 DebugFontSize;
         public Dictionary<Vector2, Chunk> chunks = new();

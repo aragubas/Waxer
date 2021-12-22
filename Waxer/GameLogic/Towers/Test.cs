@@ -50,7 +50,7 @@ namespace Waxer.GameLogic.Towers
                 
                 if (!tileUnder.TileInformation.IsColideable)
                 {
-                    Position.Y += (World.MapEnvironment.Gravity * GravityMultiplier) * delta;
+                    Position.Y += (World.WorldEnvironment.Gravity * GravityMultiplier) * delta;
 
                     GravityMultiplier += 16f * delta;
 
