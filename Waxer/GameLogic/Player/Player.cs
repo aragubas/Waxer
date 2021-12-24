@@ -183,29 +183,29 @@ namespace Waxer.GameLogic.Player
                 {
                     Inventory[i].Update(delta);
 
-                    if (TileUnderCursor != null)
+                    if (_tileUnderCursor != null)
                     {
-                        Rectangle FixedArea = new Rectangle(TileUnderCursor.GetArea().X + (int)World.Camera.CameraPosition.X,
-                            TileUnderCursor.GetArea().Y + (int)World.Camera.CameraPosition.Y, 32, 32);
+                        Rectangle FixedArea = new Rectangle(_tileUnderCursor.GetArea().X + (int)World.Camera.CameraPosition.X,
+                            _tileUnderCursor.GetArea().Y + (int)World.Camera.CameraPosition.Y, 32, 32);
 
                         if (MouseInput.Left_UpClickPos.Intersects(FixedArea))
                         {
-                            Inventory[i].DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Left_Up, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Left_Up, MouseInput.PositionVector2, World));
                         }
 
                         if (MouseInput.Right_UpClickPos.Intersects(FixedArea))
                         {
-                            Inventory[i].DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Right_Up, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Right_Up, MouseInput.PositionVector2, World));
                         }
 
                         if (MouseInput.Left_DownClickPos.Intersects(FixedArea))
                         {
-                            Inventory[i].DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Left_Down, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Left_Down, MouseInput.PositionVector2, World));
                         }
 
                         if (MouseInput.Right_DownClickPos.Intersects(FixedArea))
                         {
-                            Inventory[i].DoAction(new ItemUseContext(TileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, TileBehind.TilePosition, MouseButton.Right_Down, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Right_Down, MouseInput.PositionVector2, World));
                         }
                         
                     }

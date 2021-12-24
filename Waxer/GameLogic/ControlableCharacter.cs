@@ -13,30 +13,31 @@ namespace Waxer.GameLogic
         public float Acceleration = 10f;
         public float JumpMultiplier = 12f;
         public int Life = 300;
-        private KeyboardState oldState;
-        internal Vector2 AimVector = Vector2.Zero;
-        internal float GravityMultiplier = 0f;
-        internal bool IsJumping = false;
-        internal bool JumpAvailable = true;
-        internal float JumpProgress = 0f;
-        internal float JumpSpeed = 0f;
-        internal float JumpForce = 0f; 
-        internal MapTile TileUnderCursor = null;         
-        internal MapTile TileBehind = null;
-        internal MapTile TileRight = null;
-        internal MapTile TileLeft = null;
-        internal MapTile TileTop = null;
-        internal MapTile TileBottom = null;
-        internal MapTile TileTopLeft = null;
-        internal MapTile TileTopRight = null;
-        internal MapTile TileBottomLeft = null;
-        internal MapTile TileBottomRight = null;
-        internal MapTile SinasTile = null;
-        internal Rectangle SinasRect = Rectangle.Empty; 
-        internal MapTile CeiraTile = null;
-        internal Rectangle CeiraRect = Rectangle.Empty; 
- 
-        internal float LastDelta = 0.0f;
+        private KeyboardState _oldState;
+        internal Vector2 _aimVector = Vector2.Zero;
+        internal float _gravityMultiplier = 0f;
+        internal bool _isJumping = false;
+        internal bool _jumpAvailable = true;
+        internal float _jumpProgress = 0f;
+        internal float _jumpSpeed = 0f;
+        internal float _jumpForce = 0f; 
+        internal MapTile _tileUnderCursor = null;         
+        internal MapTile _tileBehind = null;
+        internal MapTile _tileRight = null;
+        internal MapTile _tileLeft = null;
+        internal MapTile _tileTop = null;
+        internal MapTile _tileBottom = null;
+        internal MapTile _tileTopLeft = null;
+        internal MapTile _tileTopRight = null;
+        internal MapTile _tileBottomLeft = null;
+        internal MapTile _tileBottomRight = null;
+        internal MapTile _sinasTile = null;
+        internal Rectangle _sinasRect = Rectangle.Empty; 
+        internal MapTile _ceiraTile = null;
+        internal Rectangle _ceiraRect = Rectangle.Empty; 
+        internal string _ceiraText = "";
+
+        internal float _lastDelta = 0.0f;
 
         #region DEBUG AREA
         // == DEBUG AREA ==
@@ -113,28 +114,29 @@ namespace Waxer.GameLogic
                 }
                 */
                  
-                if (SinasTile != null)
+                if (_sinasTile != null)
                 {
-                    spriteBatch.FillRectangle(new Rectangle(SinasRect.X + (int)World.Camera.CameraPosition.X, SinasRect.Y + (int)World.Camera.CameraPosition.Y, SinasRect.Width, SinasRect.Height), Color.Yellow); 
-                    RenderTileInfos(spriteBatch, SinasTile, "TOP");
+                    spriteBatch.FillRectangle(new Rectangle(_sinasRect.X + (int)World.Camera.CameraPosition.X, _sinasRect.Y + (int)World.Camera.CameraPosition.Y, _sinasRect.Width, _sinasRect.Height), Color.Yellow); 
+                    RenderTileInfos(spriteBatch, _sinasTile, "BOTT");
 
-                    SinasTile = null;
-                    SinasRect = Rectangle.Empty;
+                    _sinasTile = null;
+                    _sinasRect = Rectangle.Empty;
                 }
                  
-                /*
-                if (CeiraTile != null)
+                if (_ceiraTile != null)
                 {
-                    spriteBatch.FillRectangle(new Rectangle(CeiraRect.X + (int)World.Camera.CameraPosition.X, CeiraRect.Y + (int)World.Camera.CameraPosition.Y, CeiraRect.Width, CeiraRect.Height), Color.Orange); 
-                    RenderTileInfos(spriteBatch, CeiraTile, "TOP");
+                    spriteBatch.FillRectangle(new Rectangle(_ceiraRect.X + (int)World.Camera.CameraPosition.X, _ceiraRect.Y + (int)World.Camera.CameraPosition.Y, _ceiraRect.Width, _ceiraRect.Height), Color.Orange); 
+                    RenderTileInfos(spriteBatch, _ceiraTile, "TOP");
+
+                    _ceiraTile = null;
+                    _ceiraRect = Rectangle.Empty;
                 }
-                */
 
 
             }
 
             // Draw last delta
-            spriteBatch.DrawString(World.DebugFont, $"force_dir: {Force.ToString()}\nforce_multiplied: {(Force * MoveSpeed).ToString()}\nmove_speed: {MoveSpeed}\ndelta: {LastDelta}", new Vector2(12, 180), Color.Red);
+            spriteBatch.DrawString(World.DebugFont, $"force_dir: {Force.ToString()}\nforce_multiplied: {(Force * MoveSpeed).ToString()}\nmove_speed: {MoveSpeed}\ndelta: {_lastDelta}\n{_ceiraText}", new Vector2(12, 180), Color.Red);
  
             // Hightlights the player position    
             if (Settings.Debug_RenderPlayerPositionPoints)
@@ -145,14 +147,14 @@ namespace Waxer.GameLogic
             }
             
             // Draws information about the tile under the mouse cursor
-            if (TileUnderCursor != null)
+            if (_tileUnderCursor != null)
             {                  
-                Vector2 FixedPosition = new Vector2(((int)TileUnderCursor.TilePosition.X * 32) + (int)World.Camera.CameraPosition.X, 
-                    ((int)TileUnderCursor.TilePosition.Y * 32) + (int)World.Camera.CameraPosition.Y);
+                Vector2 FixedPosition = new Vector2(((int)_tileUnderCursor.TilePosition.X * 32) + (int)World.Camera.CameraPosition.X, 
+                    ((int)_tileUnderCursor.TilePosition.Y * 32) + (int)World.Camera.CameraPosition.Y);
 
                 // Draw tile cordinates
-                spriteBatch.DrawString(World.DebugFont, $"X:{TileUnderCursor.TilePosition.X}\n" + 
-                                                            $"Y:{TileUnderCursor.TilePosition.Y}", FixedPosition, Color.Black);
+                spriteBatch.DrawString(World.DebugFont, $"X:{_tileUnderCursor.TilePosition.X}\n" + 
+                                                            $"Y:{_tileUnderCursor.TilePosition.Y}", FixedPosition, Color.Black);
 
             }
 
@@ -179,45 +181,45 @@ namespace Waxer.GameLogic
         {
             // Tile Under Cursor
             MapTile newTile = World.GetTile(World.GetTilePosition(MouseInput.PositionVector2 - World.Camera.CameraPosition));
-            if (newTile != null) { TileUnderCursor = newTile; }
+            if (newTile != null) { _tileUnderCursor = newTile; }
 
             // Tile Behind
             newTile = World.GetTile(World.GetTilePosition(Position));
-            if (newTile != null) { TileBehind = newTile; }
+            if (newTile != null) { _tileBehind = newTile; }
 
             // Tile Top
-            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(0, -1));
-            if (newTile != null) { TileTop = newTile; }
+            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(0, -1));
+            if (newTile != null) { _tileTop = newTile; }
 
             // Tile Bottom
-            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(0, 1));
-            if (newTile != null) { TileBottom = newTile; }
+            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(0, 1));
+            if (newTile != null) { _tileBottom = newTile; }
 
             // Tile Left
-            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(-1, 0));
-            if (newTile != null) { TileLeft = newTile; }
+            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(-1, 0));
+            if (newTile != null) { _tileLeft = newTile; }
 
             // Tile Right
-            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(1, 0));
-            if (newTile != null) { TileRight = newTile; }
+            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(1, 0));
+            if (newTile != null) { _tileRight = newTile; }
 
             // Corner Edges Tiles
 
             // Tile TopLeft
-            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(-1, -1));
-            if (newTile != null) { TileTopLeft = newTile; }
+            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(-1, -1));
+            if (newTile != null) { _tileTopLeft = newTile; }
 
             // Tile TopRight
-            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(1, -1));
-            if (newTile != null) { TileTopRight = newTile; }
+            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(1, -1));
+            if (newTile != null) { _tileTopRight = newTile; }
 
             // Tile BottomLeft
-            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(-1, 1));
-            if (newTile != null) { TileBottomLeft = newTile; }
+            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(-1, 1));
+            if (newTile != null) { _tileBottomLeft = newTile; }
 
             // Tile BottomRight 
-            newTile = World.GetTile(TileBehind.TilePosition + new Vector2(1, 1));
-            if (newTile != null) { TileBottomRight = newTile; }
+            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(1, 1));
+            if (newTile != null) { _tileBottomRight = newTile; }
  
         }
         
@@ -226,103 +228,149 @@ namespace Waxer.GameLogic
             KeyboardState newState = Keyboard.GetState();
             Vector2 NextPos = Vector2.Zero;
 
-            if (Utils.CheckKeyDown(oldState, newState, Keys.D))
+            if (Utils.CheckKeyDown(_oldState, newState, Keys.D))
             {
                 NextPos.X = 1f;
             }
 
-            if (Utils.CheckKeyDown(oldState, newState, Keys.A))
+            if (Utils.CheckKeyDown(_oldState, newState, Keys.A))
             {
                 NextPos.X = -1f;
             }
  
-            if (Utils.CheckKeyUp(oldState, newState, Keys.F1))
+            if (Utils.CheckKeyUp(_oldState, newState, Keys.F1))
             {
                 MoveSpeed = 64;
             }
  
-            if (Utils.CheckKeyDown(oldState, newState, Keys.W) || Utils.CheckKeyDown(oldState, newState, Keys.Space))
+            if (Utils.CheckKeyDown(_oldState, newState, Keys.W) || Utils.CheckKeyDown(_oldState, newState, Keys.Space))
             {
-                if (JumpAvailable)
+                if (_jumpAvailable)
                 {
                     SetUpJump();
                 }
             }
 
-            if (Utils.CheckKeyDown(oldState, newState, Keys.LeftShift))
+            if (Utils.CheckKeyDown(_oldState, newState, Keys.LeftShift))
             {
                 MoveSpeed *= Acceleration;
             }
 
             Force = NextPos;
 
-            oldState = newState;
+            _oldState = newState;
         }
 
         Vector2 Force;
 
         void PlayerHitGround()
         {
-            GravityMultiplier = 0; 
+            _gravityMultiplier = 0; 
             EndJumping();
 
         }
-        
+          
         void EndJumping()
         {
-            IsJumping = false;
+            _isJumping = false;
             JumpMultiplier = 0;
-            JumpAvailable = true;
-            JumpProgress = 0;
+            _jumpAvailable = true;
+            _jumpProgress = 0;
              
         }
 
         void SetUpJump()
         {
-            IsJumping = true;
-            JumpAvailable = false;
-            JumpProgress = 12f;
+            _isJumping = true;
+            _jumpAvailable = false;
+            _jumpProgress = 12f;
         }
 
+        // Update the jump, or should i call it... Up force?
         void UpdateJump(float delta)
         {
-            float Force = (World.WorldEnvironment.Gravity * JumpProgress) * delta;
-            bool IsTopColiding = false;
+            float Force = (World.WorldEnvironment.Gravity * _jumpProgress) * delta;
+            _ceiraText = Force.ToString() + $"\nA: {_isJumping}";
+ 
+            bool isColiding = false;
 
-            
+            // Top colision detection
+            Rectangle TopArea = new Rectangle((int)Position.X, (int)Position.Y, Area.Width, Area.Height);
+
+            MapTile TopTile = World.GetTile(World.GetTilePosition(Position - new Vector2(0, 1)));
+
+            isColiding = TopTile.TileInformation.IsColideable && TopTile.GetArea().Bottom <= (TopArea.Y);
+
+            if (isColiding)
+            { 
+                _sinasTile = TopTile;
+                _sinasRect = TopArea;
+ 
+                Position.Y = TopTile.GetArea().Bottom;
+                EndJumping();
+                return;
+            }
+
+            if (_isJumping)
+            {
+                // Ending jumping if colliding
+                if (isColiding) { EndJumping(); return; }
+                Position.Y -= Force;
+
+  
+                _jumpProgress += JumpMultiplier * delta;
+
+                if (_jumpProgress > JumpMultiplier)
+                {
+                    _jumpProgress = JumpMultiplier;
+                }
+                
+            }
 
         }
 
+        // Update the constant down force, also called gravity
         void UpdateGravity(float delta)
         {
             
-            float Force = (World.WorldEnvironment.Gravity * GravityMultiplier) * delta;
+            float Force = (World.WorldEnvironment.Gravity * _gravityMultiplier) * delta;
             bool isColiding = false;
             
             // Detect bottom colision
             for(int i = 0; i < 16; i++)
             {
-                Rectangle BottomArea = new Rectangle((int)Position.X, (int)Position.Y, Area.Width,Area.Height);
-                Rectangle BottomAreaRight = new Rectangle((int)Position.X + 15, (int)Position.Y, Area.Width,Area.Height);
-                Rectangle BottomAreaLeft = new Rectangle((int)Position.X - 15, (int)Position.Y, Area.Width,Area.Height);
+                Rectangle BottomAreaRight = new Rectangle((int)Position.X + 15, (int)Position.Y + i, Area.Width,Area.Height);
+                Rectangle BottomArea = new Rectangle((int)Position.X, (int)Position.Y + i, Area.Width,Area.Height);
+                Rectangle BottomAreaLeft = new Rectangle((int)Position.X - 15, (int)Position.Y + i, Area.Width,Area.Height);
 
-                MapTile TileBottom = World.GetTile(World.GetTilePosition(Position + new Vector2(0, 32 + i)));
                 MapTile TileBottomRight = World.GetTile(World.GetTilePosition(Position + new Vector2(15, 32 + i)));
+                MapTile TileBottom = World.GetTile(World.GetTilePosition(Position + new Vector2(0, 32 + i)));
                 MapTile TileBottomLeft = World.GetTile(World.GetTilePosition(Position + new Vector2(-15, 32 + i)));
 
-                if (TileBottom.TileInformation.IsColideable)
-                {
-                    SinasTile = TileBottom;
-                    SinasRect = BottomArea;
-                }
+                bool BottomTileColision = TileBottom.TileInformation.IsColideable && BottomArea.Y <= TileBottom.GetArea().Y;
+                bool BottomLeftTileColision = TileBottomLeft.TileInformation.IsColideable && BottomAreaLeft.Y <= TileBottomLeft.GetArea().Y;
+                bool BottomRightTileColision = TileBottomRight.TileInformation.IsColideable && BottomAreaRight.Y <= TileBottomRight.GetArea().Y;
 
-                isColiding = TileBottom.TileInformation.IsColideable && BottomArea.Intersects(TileBottom.GetArea()) || 
-                             TileBottomLeft.TileInformation.IsColideable && BottomAreaLeft.Intersects(TileBottomLeft.GetArea()) ||
-                             TileBottomRight.TileInformation.IsColideable && BottomAreaRight.Intersects(TileBottomRight.GetArea());
+                isColiding = BottomTileColision || BottomLeftTileColision || BottomRightTileColision;
 
                 if (isColiding)
                 {
-                    Position.Y = TileBottom.GetArea().Y - 31;
+                    int newY = 0;
+
+                    if (BottomTileColision)
+                    {
+                        newY = TileBottom.GetArea().Y - 32;
+                    }
+                    if (BottomLeftTileColision)
+                    {
+                        newY = TileBottomLeft.GetArea().Y - 32;
+                    }
+                    if (BottomRightTileColision)
+                    {
+                        newY = TileBottomRight.GetArea().Y - 32;
+                    }
+                    
+                    Position.Y = newY;
                     PlayerHitGround();
                     break;
                 }
@@ -333,12 +381,13 @@ namespace Waxer.GameLogic
                 Position.Y += Force;
                 UpdateArea();
 
-                GravityMultiplier += 16f * delta;
+                _gravityMultiplier += 16f * delta;
             }
 
 
         }
 
+        // Update left-right forces for movement
         void UpdateAppliedForces(float delta)
         {
  
@@ -373,76 +422,6 @@ namespace Waxer.GameLogic
                 } 
             }
 
-
-            /*
-            // Top colision
-            for(int i = 0; i < 16; i++)
-            {  
-                // Top Center
-                MapTile topTile = World.GetTile(World.GetTilePosition(NextStep - new Vector2(0, i + 16)));
-                Rectangle topArea = new Rectangle((int)Position.X, (int)Position.Y - i, Area.Width, Area.Height);
-                 
-                if (i == 0)
-                {
-                    SinasTile = topTile;
-                    SinasRect = topArea;
-                }
-   
-                if (topTile.TileInformation.IsColideable && topTile.GetArea().Intersects(topArea))
-                { 
-                   NextStep = new Vector2(NextStep.X, topTile.GetArea().Bottom + i); 
-                   Console.WriteLine($"Top Colision at iteration {i}");
-                   EndJumping(); 
-                   break;
-                }
- 
-            }
- 
-            // Bottom colision
-            for(int i = 0; i < 16; i++)
-            {  
-                // Bottom Center
-                MapTile bottomTile = World.GetTile(World.GetTilePosition(NextStep + new Vector2(0, 32 + i)));
-                Rectangle bottomArea = new Rectangle((int)Position.X, (int)Position.Y - i, Area.Width, Area.Height);
-     
-                if (bottomTile.TileInformation.IsColideable && bottomTile.GetArea().Intersects(bottomArea))
-                { 
-                   NextStep = new Vector2(NextStep.X, bottomTile.GetArea().Y - (31 - i)); 
-                   if (IsJumping) { Console.WriteLine("Bottom Colision"); }
-                   PlayerHitGround();
-                   break;
-                }
- 
-                // Bottom Left
-                MapTile bottomLeftTile = World.GetTile(World.GetTilePosition(NextStep + new Vector2(16 - i, 32 + i)));
-                Rectangle bottomLeftArea = new Rectangle(((int)Position.X - 16) + i, (int)Position.Y - i, Area.Width, Area.Height);
-
-                if (i == 0) { SinasTile = bottomLeftTile; SinasRect = bottomLeftArea; }
- 
-                if (bottomLeftTile.TileInformation.IsColideable && bottomLeftTile.GetArea().Intersects(bottomLeftArea))
-                {   
-                   NextStep = new Vector2(NextStep.X, bottomLeftTile.GetArea().Y - (31 - i));
-                   if (IsJumping) { Console.WriteLine("Bottom Left Colision"); }
-                   PlayerHitGround();
-                   break;
-                }
- 
-                // Bottom Right
-                MapTile bottomRightTile = World.GetTile(World.GetTilePosition(NextStep + new Vector2(-(16 - i), 32 + i)));
-                Rectangle bottomRightArea = new Rectangle(((int)Position.X - 16) - i, (int)Position.Y - i, Area.Width, Area.Height);
-
-                if (i == 0) { CeiraTile = bottomRightTile; CeiraRect = bottomRightArea; }
- 
-                if (bottomRightTile.TileInformation.IsColideable && bottomRightTile.GetArea().Intersects(bottomRightArea))
-                {
-                   NextStep = new Vector2(NextStep.X, bottomRightTile.GetArea().Y - (31 - i));
-                   if (IsJumping) { Console.WriteLine("Bottom Right Colision"); }
-                   PlayerHitGround();
-                   break;
-                }
-
-            }
-            */
             
             
             Position = NextStep; 
@@ -466,7 +445,7 @@ namespace Waxer.GameLogic
                 BlendColor.B += Convert.ToByte((2f * delta * 255));
             }            
             
-            AimVector = -(Position - (MouseInput.PositionVector2 - World.Camera.CameraPosition));
+            _aimVector = -(Position - (MouseInput.PositionVector2 - World.Camera.CameraPosition));
 
             GetTilesAround(Position);
 
@@ -483,7 +462,7 @@ namespace Waxer.GameLogic
 
             delta = oldDelta;
 
-            LastDelta = delta;
+            _lastDelta = delta;
 
         }
 
