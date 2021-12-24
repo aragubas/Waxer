@@ -193,7 +193,7 @@ namespace Waxer.GameLogic.Player
                             Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Left_Up, MouseInput.PositionVector2, World));
                         }
 
-                        if (MouseInput.Right_UpClickPos.Intersects(FixedArea))
+                        if (MouseInput.Right_UpClickPos.Intersects(FixedArea)) 
                         {
                             Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Right_Up, MouseInput.PositionVector2, World));
                         }
