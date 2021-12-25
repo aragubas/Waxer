@@ -18,7 +18,8 @@ namespace Waxer.GameLogic
     {
         public float MoveSpeed = 64f;
         public float MinimumSpeed = 64f;
-        public float Acceleration = 8f;
+        public float MaximumSpeed = 64f;
+        public float Acceleration = 0.8f;
         public float JumpMultiplier = 12f;
         public int Life = 300;
         private KeyboardState _oldState;
@@ -31,20 +32,12 @@ namespace Waxer.GameLogic
         internal float _jumpForce = 0f; 
         internal MapTile _tileUnderCursor = null;         
         internal MapTile _tileBehind = null;
-        internal MapTile _tileRight = null;
-        internal MapTile _tileLeft = null;
-        internal MapTile _tileTop = null;
-        internal MapTile _tileBottom = null;
-        internal MapTile _tileTopLeft = null;
-        internal MapTile _tileTopRight = null;
-        internal MapTile _tileBottomLeft = null;
-        internal MapTile _tileBottomRight = null;
         internal MapTile _sinasTile = null;
         internal Rectangle _sinasRect = Rectangle.Empty; 
         internal MapTile _ceiraTile = null;
         internal Rectangle _ceiraRect = Rectangle.Empty; 
         internal string _ceiraText = "";
-
+ 
         internal float _lastDelta = 0.0f;
 
         #region DEBUG AREA
@@ -184,7 +177,7 @@ namespace Waxer.GameLogic
 
 
         // Physics
-        // Get all tiles around the player, including all quadrants
+        // Get tiles behind and under cursor
         //
         void GetTilesAround(Vector2 Position)
         {
@@ -194,42 +187,7 @@ namespace Waxer.GameLogic
 
             // Tile Behind
             newTile = World.GetTile(World.GetTilePosition(Position));
-            if (newTile != null) { _tileBehind = newTile; }
-
-            // Tile Top
-            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(0, -1));
-            if (newTile != null) { _tileTop = newTile; }
-
-            // Tile Bottom
-            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(0, 1));
-            if (newTile != null) { _tileBottom = newTile; }
-
-            // Tile Left
-            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(-1, 0));
-            if (newTile != null) { _tileLeft = newTile; }
-
-            // Tile Right
-            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(1, 0));
-            if (newTile != null) { _tileRight = newTile; }
-
-            // Corner Edges Tiles
-
-            // Tile TopLeft
-            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(-1, -1));
-            if (newTile != null) { _tileTopLeft = newTile; }
-
-            // Tile TopRight
-            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(1, -1));
-            if (newTile != null) { _tileTopRight = newTile; }
-
-            // Tile BottomLeft
-            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(-1, 1));
-            if (newTile != null) { _tileBottomLeft = newTile; }
-
-            // Tile BottomRight 
-            newTile = World.GetTile(_tileBehind.TilePosition + new Vector2(1, 1));
-            if (newTile != null) { _tileBottomRight = newTile; }
- 
+            if (newTile != null) { _tileBehind = newTile; } 
         }
         
         void UpdateInput(float delta)
@@ -263,7 +221,7 @@ namespace Waxer.GameLogic
 
             if (Utils.CheckKeyDown(_oldState, newState, Keys.LeftShift))
             {
-                MoveSpeed += MoveSpeed * Acceleration * delta;
+                MoveSpeed += MoveSpeed * Acceleration * delta; 
             }
 
             Force = NextPos;
@@ -321,9 +279,6 @@ namespace Waxer.GameLogic
 
             if (isColiding && _isJumping)
             { 
-                _sinasTile = TopTile;
-                _sinasRect = TopArea;
-
                 int newY = 0;
 
                 if (TopLeftColiding)
@@ -488,10 +443,11 @@ namespace Waxer.GameLogic
      
             UpdateInput(delta);
             UpdateMoveSpeed(delta);
+            
             if (!_tileBehind.TileInformation.IsColideable) { UpdateAppliedForces(delta); }
             UpdateJump(delta);
             UpdateGravity(delta); 
-
+ 
             _lastDelta = delta;
 
         }

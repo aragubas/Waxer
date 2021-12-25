@@ -25,13 +25,13 @@ namespace Waxer
 		{
 			graphics = new GraphicsDeviceManager(this);
 
-            IsFixedTimeStep = false;
+            IsFixedTimeStep = true;
             //TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 144);
 
             // Make sure its running with VSync 
             if (!graphics.SynchronizeWithVerticalRetrace)
             {
-                graphics.SynchronizeWithVerticalRetrace = true;
+                graphics.SynchronizeWithVerticalRetrace = false;
                 graphics.ApplyChanges();
             }
 
@@ -69,7 +69,7 @@ namespace Waxer
             {
                 delta = Settings.StableDelta; 
             }
-
+ 
             gameMap.Update(delta);
         }
 

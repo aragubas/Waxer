@@ -25,7 +25,7 @@ namespace Waxer
         public static string SoundPath = ContentFolder + "sound\\";
         public static string ConfigPath = ContentFolder + "config\\";
         
-        // Debug options
+        // Debug options 
         public static bool Debug_RenderColidersTiles = true;
         public static bool Debug_RenderPlayerPositionPoints = true;
         public static bool Debug_RenderItemsRangeBox = true;
