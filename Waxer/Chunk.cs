@@ -48,36 +48,36 @@ namespace Waxer
                 // Left Chunk
                 if (ChunkPosition.X - 1 >= 1)
                 {
-                    if (!ParentMap.chunks.ContainsKey(new Vector2(ChunkPosition.X - 1, ChunkPosition.Y)))
+                    if (!ParentMap.Chunks.ContainsKey(new Vector2(ChunkPosition.X - 1, ChunkPosition.Y)))
                     {                        
-                        ParentMap.chunks.Add(new Vector2(ChunkPosition.X - 1, ChunkPosition.Y), new Chunk(new Vector2(ChunkPosition.X - 1, ChunkPosition.Y), ParentMap));
+                        ParentMap.Chunks.Add(new Vector2(ChunkPosition.X - 1, ChunkPosition.Y), new Chunk(new Vector2(ChunkPosition.X - 1, ChunkPosition.Y), ParentMap));
                     }
                 }
 
                 // Right Chunk
                 if (ChunkPosition.X + 1 >= 1)
                 {
-                    if (!ParentMap.chunks.ContainsKey(new Vector2(ChunkPosition.X + 1, ChunkPosition.Y)))
+                    if (!ParentMap.Chunks.ContainsKey(new Vector2(ChunkPosition.X + 1, ChunkPosition.Y)))
                     {                        
-                        ParentMap.chunks.Add(new Vector2(ChunkPosition.X + 1, ChunkPosition.Y), new Chunk(new Vector2(ChunkPosition.X + 1, ChunkPosition.Y), ParentMap));
+                        ParentMap.Chunks.Add(new Vector2(ChunkPosition.X + 1, ChunkPosition.Y), new Chunk(new Vector2(ChunkPosition.X + 1, ChunkPosition.Y), ParentMap));
                     }
                 }
 
                 // Top Chunk
                 if (ChunkPosition.Y - 1 >= 1)
                 {
-                    if (!ParentMap.chunks.ContainsKey(new Vector2(ChunkPosition.X, ChunkPosition.Y - 1)))
+                    if (!ParentMap.Chunks.ContainsKey(new Vector2(ChunkPosition.X, ChunkPosition.Y - 1)))
                     {                        
-                        ParentMap.chunks.Add(new Vector2(ChunkPosition.X, ChunkPosition.Y - 1), new Chunk(new Vector2(ChunkPosition.X, ChunkPosition.Y - 1), ParentMap));
+                        ParentMap.Chunks.Add(new Vector2(ChunkPosition.X, ChunkPosition.Y - 1), new Chunk(new Vector2(ChunkPosition.X, ChunkPosition.Y - 1), ParentMap));
                     }
                 }
  
                 // Bottom Chunk
                 if (ChunkPosition.Y + 1 >= 1)
                 {
-                    if (!ParentMap.chunks.ContainsKey(new Vector2(ChunkPosition.X, ChunkPosition.Y + 1)))
+                    if (!ParentMap.Chunks.ContainsKey(new Vector2(ChunkPosition.X, ChunkPosition.Y + 1)))
                     {                        
-                        ParentMap.chunks.Add(new Vector2(ChunkPosition.X, ChunkPosition.Y + 1), new Chunk(new Vector2(ChunkPosition.X, ChunkPosition.Y + 1), ParentMap));
+                        ParentMap.Chunks.Add(new Vector2(ChunkPosition.X, ChunkPosition.Y + 1), new Chunk(new Vector2(ChunkPosition.X, ChunkPosition.Y + 1), ParentMap));
                     }
                 }
                  

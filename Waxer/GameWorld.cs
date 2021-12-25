@@ -36,9 +36,8 @@ namespace Waxer
         public EnvironmentSettings WorldEnvironment = new EnvironmentSettings();
         public SpriteFont DebugFont;
         public Vector2 DebugFontSize;
-        public Dictionary<Vector2, Chunk> chunks = new();
+        public Dictionary<Vector2, Chunk> Chunks = new();
         InventoryUI inventoryUI;
-        List<Chunk> _visibleChunks = new List<Chunk>();
  
         public GameWorld()
         {
@@ -46,9 +45,7 @@ namespace Waxer
             Properties.TileSize = new Vector2(32, 32);
             
             Chunk initialChunk = new Chunk(new Vector2(0, 0), this);
-            chunks.Add(new Vector2(0, 0), initialChunk);
-
-            _visibleChunks.Add(initialChunk); 
+            Chunks.Add(new Vector2(0, 0), initialChunk);
  
             Player = new PlayerEntity(new Vector2(8  * 32, 10 * 32), this);
             Entities.Add(new GameLogic.Towers.Test(new Vector2(4 * 32, 9 * 32), this));
@@ -64,16 +61,14 @@ namespace Waxer
             int Iterations = 0;
             int chunksCount = 0;
 
-            Chunk[] chunkList = new Chunk[chunks.Count];
-            chunks.Values.CopyTo(chunkList, 0);
-            _visibleChunks.Clear();
+            Chunk[] chunkList = new Chunk[Chunks.Count];
+            Chunks.Values.CopyTo(chunkList, 0);
 
             for(int i = 0; i < chunkList.Length; i++)
             {
                 if (Camera.IsOnScreen(chunkList[i].Area))
                 {
                     chunksCount++; 
-                    _visibleChunks.Add(chunkList[i]);
                     Iterations += chunkList[i].Draw(spriteBatch, Camera); 
                 }
 
@@ -132,7 +127,7 @@ namespace Waxer
 
         public MapTile GetTile(Vector2 pos)
         { 
-            foreach(Chunk chunk in _visibleChunks)
+            foreach(Chunk chunk in Chunks.Values)
             {
                 if (chunk.tiles.ContainsKey(pos))
                 {
@@ -144,7 +139,7 @@ namespace Waxer
 
         public bool SetTile(Vector2 pos, TileInfo newInfos)
         {
-            foreach(Chunk chunk in _visibleChunks)
+            foreach(Chunk chunk in Chunks.Values)
             {
                 if (chunk.tiles.ContainsKey(pos))
                 {
