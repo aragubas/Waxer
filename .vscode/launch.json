@@ -21,6 +21,19 @@
       "name": ".NET Core Attach",
       "type": "coreclr",
       "request": "attach"
+    },
+    {
+      "name": ".NET Publish",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "publish",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/Production/Waxer.dll",
+      "args": [], 
+      "cwd": "${workspaceFolder}/Production/",
+      // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+      "console": "externalTerminal",
+      "stopAtEntry": false
     }
   ]
 }

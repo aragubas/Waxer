@@ -14,16 +14,17 @@
       ],
       "problemMatcher": "$msCompile"
     },
-    {
+    { 
       "label": "publish",
       "command": "dotnet",
       "type": "process",
       "args": [
-        "publish",
-        "${workspaceFolder}/Waxer/Waxer/Waxer.csproj",
+        "publish", 
+        "${workspaceFolder}/Waxer/Waxer.csproj",
         "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
+        "/consoleloggerparameters:NoSummary",
+        "--output=Production/",
+      ], 
       "problemMatcher": "$msCompile"
     },
     {
