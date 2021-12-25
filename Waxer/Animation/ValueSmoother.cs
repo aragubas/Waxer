@@ -22,9 +22,10 @@ namespace Waxer.Animation
             this.TargetValue = TargetValue;
             this.CurrentValue = CurrentValue;
         }
-
+ 
         public int Update(float delta)
         {
+            
             if (CurrentValue != TargetValue)
             { 
                 if (TargetValue - CurrentValue > 0)

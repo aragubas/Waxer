@@ -38,7 +38,8 @@ namespace Waxer
         public Vector2 DebugFontSize;
         public Dictionary<Vector2, Chunk> chunks = new();
         InventoryUI inventoryUI;
-
+        List<Chunk> _visibleChunks = new List<Chunk>();
+ 
         public GameWorld()
         {
             Properties = new MapProperties();
@@ -47,6 +48,8 @@ namespace Waxer
             Chunk initialChunk = new Chunk(new Vector2(0, 0), this);
             chunks.Add(new Vector2(0, 0), initialChunk);
 
+            _visibleChunks.Add(initialChunk); 
+ 
             Player = new PlayerEntity(new Vector2(8  * 32, 10 * 32), this);
             Entities.Add(new GameLogic.Towers.Test(new Vector2(4 * 32, 9 * 32), this));
             
@@ -57,26 +60,21 @@ namespace Waxer
         // Draw the map on its batch
         void DrawMap(SpriteBatch spriteBatch)
         {
-            if (DebugFont == null) 
-            {
-                DebugFont = Graphics.Fonts.GetSpriteFont(Graphics.Fonts.GetFontDescriptor("/PressStart2P", 8, spriteBatch.GraphicsDevice));
-                DebugFontSize = DebugFont.MeasureString("H"); 
-            }
-
             spriteBatch.Begin(transformMatrix: Camera.GetMatrix());
             int Iterations = 0;
             int chunksCount = 0;
 
             Chunk[] chunkList = new Chunk[chunks.Count];
             chunks.Values.CopyTo(chunkList, 0);
- 
+            _visibleChunks.Clear();
+
             for(int i = 0; i < chunkList.Length; i++)
             {
                 if (Camera.IsOnScreen(chunkList[i].Area))
                 {
-                    chunksCount++;
-                    Iterations += chunkList[i].Draw(spriteBatch, Camera);
-
+                    chunksCount++; 
+                    _visibleChunks.Add(chunkList[i]);
+                    Iterations += chunkList[i].Draw(spriteBatch, Camera); 
                 }
 
             }
@@ -133,8 +131,8 @@ namespace Waxer
 
 
         public MapTile GetTile(Vector2 pos)
-        {
-            foreach(Chunk chunk in chunks.Values)
+        { 
+            foreach(Chunk chunk in _visibleChunks)
             {
                 if (chunk.tiles.ContainsKey(pos))
                 {
@@ -146,7 +144,7 @@ namespace Waxer
 
         public bool SetTile(Vector2 pos, TileInfo newInfos)
         {
-            foreach(Chunk chunk in chunks.Values)
+            foreach(Chunk chunk in _visibleChunks)
             {
                 if (chunk.tiles.ContainsKey(pos))
                 {
@@ -159,6 +157,12 @@ namespace Waxer
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            if (DebugFont == null) 
+            {
+                DebugFont = Graphics.Fonts.GetSpriteFont(Graphics.Fonts.GetFontDescriptor("/PressStart2P", 8, spriteBatch.GraphicsDevice));
+                DebugFontSize = DebugFont.MeasureString("H"); 
+            }
+
             // Center the camera to the center of the player
             Camera.CenterTo(new Vector2(Player.Position.X + Player.Texture.Width / 2, Player.Position.Y + Player.Texture.Height / 2), spriteBatch.GraphicsDevice.Viewport);
 
@@ -171,10 +175,8 @@ namespace Waxer
 
         public void Update(float delta)
         {
-            Camera.Update(delta);
-            
             Player.Update(delta);    
-            
+             
             UpdateEntities(delta);
 
             inventoryUI.Update(delta);

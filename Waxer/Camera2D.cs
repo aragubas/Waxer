@@ -9,19 +9,20 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Waxer.Animation;
 
 namespace Waxer
 {
     public class Camera2D
     {
         public Vector2 CameraPosition = Vector2.Zero;
-        public float Smoothness = 0.6f;
+        public float Smoothness = 0.2f;
         Vector2 _animatedCameraPosition = Vector2.Zero;
         public Viewport viewport;
-
+ 
         public Matrix GetMatrix()
         {
-            return Matrix.CreateTranslation(_animatedCameraPosition.X, _animatedCameraPosition.Y, 0);
+            return Matrix.CreateTranslation(CameraPosition.X, CameraPosition.Y, 0);
         }
 
         public bool IsOnScreen(Rectangle thisThing)
@@ -39,15 +40,8 @@ namespace Waxer
             this.viewport = viewport;
             CameraPosition.X = viewport.Width / 2 - positionToCenter.X;
             CameraPosition.Y = viewport.Height / 2 - positionToCenter.Y;            
-
+            
         } 
-
-        public void Update(float delta)
-        {
-            _animatedCameraPosition.X = MathHelper.LerpPrecise(CameraPosition.X, _animatedCameraPosition.X, Smoothness * delta);
-            _animatedCameraPosition.Y = MathHelper.LerpPrecise(CameraPosition.Y, _animatedCameraPosition.Y, Smoothness * delta);
  
-        }
-
     }
 }

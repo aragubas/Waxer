@@ -168,7 +168,7 @@ namespace Waxer.GameLogic.Player.Inventory
                     EnterFullInventory();
                 }
             }
-
+ 
             oldState = newState;
         }
 

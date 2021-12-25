@@ -24,15 +24,16 @@ namespace Waxer
 		public GameMain()
 		{
 			graphics = new GraphicsDeviceManager(this);
-
-            IsFixedTimeStep = true;
+ 
+            IsFixedTimeStep = false;
             //TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 144);
-
+  
             // Make sure its running with VSync 
             if (!graphics.SynchronizeWithVerticalRetrace)
-            {
-                graphics.SynchronizeWithVerticalRetrace = false;
-                graphics.ApplyChanges();
+            {  
+                graphics.SynchronizeWithVerticalRetrace = true;
+                graphics.IsFullScreen = false; 
+                graphics.ApplyChanges(); 
             }
 
             Reference = this;
