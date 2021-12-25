@@ -109,10 +109,10 @@ namespace Waxer.GameLogic.Player.Inventory
         {
             WidthValueSmooth.TargetValue = Size.X;
             HeightValueSmooth.TargetValue = Size.Y;
-  
+
             Area.Width = WidthValueSmooth.Update(delta);
             Area.Height = HeightValueSmooth.Update(delta);
-
+ 
             if (SelectedInventoryItem == null) 
             { 
                 WidthValueSmooth.TargetValue = 10;

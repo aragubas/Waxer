@@ -66,16 +66,16 @@ namespace Waxer.GameLogic.Player.Inventory
             Viewport oldViewport = spriteBatch.GraphicsDevice.Viewport;
             Viewport viewport = new Viewport(Area);
 
-            // Change viewport
+            // Change viewport so overflow doesn't happen
             spriteBatch.GraphicsDevice.Viewport = viewport;
-  
+
             spriteBatch.Begin(); 
             // Draw the background
             DrawBackground(spriteBatch);
 
             int NumberRowsToDraw = 10;
             int SelectedItemIndex = -1;
- 
+
             if (Area.Height > OneRowHeight) { NumberRowsToDraw = items.Count; }
 
             for(int i = 0; i < NumberRowsToDraw; i++)

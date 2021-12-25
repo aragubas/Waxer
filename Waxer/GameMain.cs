@@ -27,27 +27,24 @@ namespace Waxer
  
             IsFixedTimeStep = false;
             //TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 144);
-  
+      
             // Make sure its running with VSync 
-            if (!graphics.SynchronizeWithVerticalRetrace)
-            {  
-                graphics.SynchronizeWithVerticalRetrace = true;
-                graphics.IsFullScreen = false; 
-                graphics.ApplyChanges(); 
-            }
+            graphics.SynchronizeWithVerticalRetrace = false;
+            graphics.IsFullScreen = false; 
+            graphics.ApplyChanges(); 
 
             Reference = this;
 		}
 
         protected override void Initialize()
         {
-			if (!Directory.Exists(Settings.ContentFolder)) { throw new DirectoryNotFoundException("Cannot find data folder."); }
+			if (!Directory.Exists(Settings.ContentFolder)) { throw new DirectoryNotFoundException("Cannot find content folder."); }
             
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // Loads all game sprite into ram
             Graphics.Sprites.LoadAllSprites(GraphicsDevice);
-
+ 
             // Creates a new cursor renderer
             cursorRender = new CursorRenderer();
             
@@ -64,7 +61,7 @@ namespace Waxer
             MouseInput.Update();
 
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            
+             
             // Limit the game to a stable "delta value"
             if (delta > Settings.StableDelta) 
             {
