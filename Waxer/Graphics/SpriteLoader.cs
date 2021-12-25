@@ -1,3 +1,11 @@
+/*
+    Copyright(C) Aragubas - All Rights Reserved
+    Unauthorized copying of this file, via any media such as Videos, Screenshots or Copy/Paste is strictly prohibited
+    Propietary and Confidential
+    Only those who are envolved in production of this project may modify the Source Code, but not distribute it.
+    Written by Paulo Otávio <vaiogames18@gmail.com> or <dpaulootavio5@outlook.com>, December 24, 2021
+*/
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,9 +16,6 @@ namespace Waxer.Graphics
     public static class Sprites
     {
 
-        // Sprites Variables
-        //public static List<string> AllSpritedLoaded_Names = new List<string>();
-        //public static List<Texture2D> AllSpritedLoaded_Content = new List<Texture2D>();
         public static Dictionary<string, Texture2D> LoadedSprites = new Dictionary<string, Texture2D>();
         public static Texture2D MissingTexture;
 

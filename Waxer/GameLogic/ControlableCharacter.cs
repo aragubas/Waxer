@@ -1,3 +1,11 @@
+/*
+    Copyright(C) Aragubas - All Rights Reserved
+    Unauthorized copying of this file, via any media such as Videos, Screenshots or Copy/Paste is strictly prohibited
+    Propietary and Confidential
+    Only those who are envolved in production of this project may modify the Source Code, but not distribute it.
+    Written by Paulo Otávio <vaiogames18@gmail.com> or <dpaulootavio5@outlook.com>, December 24, 2021
+*/
+
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -453,8 +461,16 @@ namespace Waxer.GameLogic
         //
         internal void UpdateChracter(float delta)
         {
-            if (Position.X < 0) { Position.X = 0; UpdateArea(); }
-            if (Position.Y < 0) { Position.Y = 0; UpdateArea(); }
+ 
+            // Fix Crashing when player position is less than 0
+            if (Position.X < 0) 
+            { 
+                Position.X = 0; UpdateArea(); 
+            }
+            if (Position.Y < 0) 
+            { 
+                Position.Y = 0; UpdateArea(); 
+            }
             
             if (BlendColor.G < 255)
             {
@@ -469,20 +485,12 @@ namespace Waxer.GameLogic
             _aimVector = -(Position - (MouseInput.PositionVector2 - World.Camera.CameraPosition));
 
             GetTilesAround(Position);
-
-            float oldDelta = delta;
- 
-            // Limit delta to a stable value
-            // HACK: Fix for making colision detection and physics stable
-            if (delta > Settings.Physics_StableDelta) { delta = Settings.Physics_StableDelta; }
-    
+     
             UpdateInput(delta);
             UpdateMoveSpeed(delta);
             if (!_tileBehind.TileInformation.IsColideable) { UpdateAppliedForces(delta); }
             UpdateJump(delta);
-            UpdateGravity(delta);
- 
-            delta = oldDelta;
+            UpdateGravity(delta); 
 
             _lastDelta = delta;
 
