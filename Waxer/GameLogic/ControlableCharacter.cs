@@ -17,23 +17,22 @@ namespace Waxer.GameLogic
     public abstract class ControlableCharacter : WorldEntity
     {
         public float MoveSpeed = 78f;
-        public float MinimumSpeed = 78f;
         public float MaximumSpeed = 196f;
         public float Acceleration = 1.8f;
-        public float JumpMultiplier = 12f;
-        public float JumpHeight = 64f;
+        public float JumpMultiplier = 1f;
+        public float JumpHeight = 4f;
         public int Life = 300;
         private KeyboardState _oldState;
         internal Vector2 _aimVector = Vector2.Zero;
         internal float _gravityMultiplier = 0f;
         internal bool _isJumping = false;
         internal bool _jumpAvailable = true;
-        internal float _jumpProgress = 0f;
-        internal float _jumpSpeed = 0f;
-        internal float _jumpForce = 0f; 
+        internal float _jumpProgress = 0f; 
+        internal float _jumpForce = 2f; 
         internal float _jumpAccumulatedForce = 0f; 
         internal bool _jumpEnding = false;
-         
+        internal float _lastFriction = 0f; 
+        internal float _moveAcceleration = 0f;
         internal MapTile _tileUnderCursor = null;         
         internal MapTile _tileBehind = null;
         internal MapTile _sinasTile = null;
@@ -41,7 +40,8 @@ namespace Waxer.GameLogic
         internal MapTile _ceiraTile = null;
         internal Rectangle _ceiraRect = Rectangle.Empty; 
         internal string _ceiraText = "";
- 
+        internal float _deaceleration = 0;
+
         internal float _lastDelta = 0.0f;
 
         #region DEBUG AREA
@@ -141,7 +141,7 @@ namespace Waxer.GameLogic
             }
 
             // Draw last delta
-            spriteBatch.DrawString(World.DebugFont, $"force_dir: {Force.ToString()}\nforce_multiplied: {(Force * MoveSpeed).ToString()}\nmove_speed: {MoveSpeed}\ndelta: {_lastDelta}\n{_ceiraText}", new Vector2(12, 180), Color.Red);
+            spriteBatch.DrawString(World.DebugFont, $"lr_dir: {MovePosition.ToString()}\nlr_dir_multiplied: {(MovePosition * _moveAcceleration).ToString()}\nmove_acceleration: {_moveAcceleration}\ndelta: {_lastDelta}\ndeacceleration: {_deaceleration}\n{_ceiraText}", new Vector2(12, 180), Color.Red);
             _ceiraText = "";
 
             // Hightlights the player position    
@@ -174,19 +174,17 @@ namespace Waxer.GameLogic
         //
         void UpdateMoveSpeed(float delta)
         {
-            MoveSpeed -= MoveSpeed / Acceleration * delta;
-            if (MoveSpeed < MinimumSpeed) { MoveSpeed = MinimumSpeed; }
-             
-            // Physics calculation maximum move speed
-            if (MoveSpeed > 1024) { MoveSpeed = 1024; } 
+            _moveAcceleration -= _deaceleration;
             
-            if (MoveSpeed > MaximumSpeed) { MoveSpeed = MaximumSpeed; } 
+            if (_moveAcceleration < 0) { _moveAcceleration = 0; }
+            if (_moveAcceleration > MaximumSpeed) { _moveAcceleration = MaximumSpeed; }
+
+            LimitPhysicsSpeed();
         } 
 
         void StopJumping()
         { 
             _jumpEnding = true; 
-            _jumpProgress = _jumpProgress / 1.9f;
         }
 
         // Physics
@@ -206,24 +204,67 @@ namespace Waxer.GameLogic
         void UpdateInput(float delta)
         {
             KeyboardState newState = Keyboard.GetState();
-            Vector2 NextPos = Vector2.Zero;
-
+            int MovePos = 0;
+ 
             if (Utils.CheckKeyDown(_oldState, newState, Keys.D))
             {
-                NextPos.X = 1f;
+                MovePos = 1;
             }
 
             if (Utils.CheckKeyDown(_oldState, newState, Keys.A))
             {
-                NextPos.X = -1f;
+                MovePos = -1;
             }
  
             if (Utils.CheckKeyUp(_oldState, newState, Keys.F1))
             {
-                MoveSpeed = 64;
+                _moveAcceleration = 0;
                 EndJumping(); 
             }
  
+
+
+
+
+
+            if (Utils.CheckKeyUp(_oldState, newState, Keys.F5))
+            {
+                GameMain.Reference.IsFixedTimeStep = true;
+                GameMain.Reference.TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 15);
+                
+                // Make sure its running with VSync 
+                GameMain.Reference.graphics.SynchronizeWithVerticalRetrace = false;
+                GameMain.Reference.graphics.ApplyChanges(); 
+
+                Console.WriteLine("15 fps lock");
+            }
+ 
+            if (Utils.CheckKeyUp(_oldState, newState, Keys.F6))
+            {
+                GameMain.Reference.IsFixedTimeStep = false;
+                
+                // Make sure its running with VSync 
+                GameMain.Reference.graphics.SynchronizeWithVerticalRetrace = false;
+                GameMain.Reference.graphics.ApplyChanges(); 
+                Console.WriteLine("Unlimited fps lock");
+            }
+
+            if (Utils.CheckKeyUp(_oldState, newState, Keys.F7))
+            {
+                GameMain.Reference.IsFixedTimeStep = false;
+                
+                // Make sure its running with VSync 
+                GameMain.Reference.graphics.SynchronizeWithVerticalRetrace = true;
+                GameMain.Reference.graphics.ApplyChanges(); 
+                Console.WriteLine("VSYNC fps lock");
+            }
+
+
+
+
+
+
+
             if (Utils.CheckKeyDown(_oldState, newState, Keys.W))
             {
                 if (_jumpAvailable)
@@ -233,23 +274,25 @@ namespace Waxer.GameLogic
             }else 
             {  
                 // Instead of disabling jump 
-                if (_isJumping)
+                if (_isJumping) 
                 { 
                     StopJumping();
-                } 
+                }
             }
- 
+
+            /*
             if (Utils.CheckKeyDown(_oldState, newState, Keys.LeftShift))
             {
-                MoveSpeed += MoveSpeed * Acceleration * delta; 
+                _moveAcceleration += (MoveSpeed - _lastFriction) * Acceleration * delta; 
             } 
-
-            Force = NextPos;
-
+            */
+  
+            MovePosition += MovePos;
+            if (MovePos != 0) { _moveAcceleration += (MoveSpeed - (Acceleration * _lastFriction)); }
+ 
             _oldState = newState;
         }
 
-        Vector2 Force;
 
         void PlayerHitGround()
         {
@@ -272,23 +315,23 @@ namespace Waxer.GameLogic
         {
             _isJumping = true;
             _jumpAvailable = false;
-            _jumpProgress = 18f;
+            _jumpProgress = 4;
              
         }
-
+ 
         // Update the jump, or should i call it... Up force?
         void UpdateJump(float delta)
         {
             bool isColiding = false;
             float Force = (World.WorldEnvironment.Gravity * _jumpProgress) * delta;
-            _ceiraText += $"\nForce {Force.ToString()}\nJumping: {_isJumping}\nAccumulated Force: {_jumpAccumulatedForce}"; 
+            _ceiraText += $"\nJump Force {Force.ToString()}\nJumping: {_isJumping}\nAccumulated Force: {_jumpAccumulatedForce}"; 
              
             // Top colision detection
             Vector2 nextPosition = new Vector2(Position.X, Position.Y - Force);
             Rectangle TopArea = new Rectangle((int)Position.X, (int)nextPosition.Y, Area.Width, Area.Height);
             Rectangle TopLeftArea = new Rectangle((int)Position.X - 15, (int)nextPosition.Y, Area.Width, Area.Height);
             Rectangle TopRightArea = new Rectangle((int)Position.X + 15, (int)nextPosition.Y, Area.Width, Area.Height);
-     
+            
             MapTile TopLeftTile = World.GetTile(World.GetTilePosition(nextPosition - new Vector2(15, 1)));
             MapTile TopTile = World.GetTile(World.GetTilePosition(nextPosition - new Vector2(0, 1)));
             MapTile TopRightTile = World.GetTile(World.GetTilePosition(nextPosition - new Vector2(-15, 1)));
@@ -296,7 +339,7 @@ namespace Waxer.GameLogic
             bool TopLeftColiding = TopLeftTile.TileInformation.IsColideable && TopLeftTile.GetArea().Bottom <= Position.Y;
             bool TopColiding = TopTile.TileInformation.IsColideable && TopTile.GetArea().Bottom <= Position.Y;
             bool TopRightColiding = TopRightTile.TileInformation.IsColideable && TopRightTile.GetArea().Bottom <= Position.Y;
-            
+             
 
             isColiding = TopLeftColiding || TopRightColiding || TopColiding;
 
@@ -321,45 +364,22 @@ namespace Waxer.GameLogic
                 EndJumping();
                 return;
             }
+            
+            _ceiraText += $"\nJump Progress: {_jumpProgress}\nJump Ending: {_jumpEnding}";
     
             if (_isJumping)
             {
                 // Ending jumping if colliding
                 if (isColiding) { EndJumping(); return; }
-
-                // If jump is ending
-                if (!_jumpEnding)
-                {
-                    // Increase jump progress
-                    _jumpProgress += JumpMultiplier;
-
-                    // Clip jump progress to 16 
-                    //if (_jumpProgress > 32) { _jumpProgress = 32; }  
  
-                    // Increase accumulated force 
-                    _jumpAccumulatedForce += Force;
-
-                    if (_jumpAccumulatedForce > JumpHeight) 
-                    {  
-                        StopJumping(); 
-                    } 
+                _jumpProgress += _jumpForce;
  
-                }else 
-                { 
-                    _jumpProgress -= JumpMultiplier * delta;
+                if (_jumpForce < 0) { EndJumping(); }
 
-                    if (_jumpProgress <= 0)
-                    {
-                        EndJumping();
-                        return; 
-                    }
-                }
-
- 
                 // Update player position
                 Position.Y -= Force;
             }
-
+ 
         }
 
         // Update the constant down force, also called gravity
@@ -377,7 +397,7 @@ namespace Waxer.GameLogic
             MapTile TileBottomRight = World.GetTile(World.GetTilePosition(Position + new Vector2(15, 32)));
             MapTile TileBottom = World.GetTile(World.GetTilePosition(Position + new Vector2(0, 32)));
             MapTile TileBottomLeft = World.GetTile(World.GetTilePosition(Position + new Vector2(-15, 32)));
- 
+
             bool BottomTileColision = TileBottom.TileInformation.IsColideable && BottomArea.Y <= TileBottom.GetArea().Y;
             bool BottomLeftTileColision = TileBottomLeft.TileInformation.IsColideable && BottomAreaLeft.Y <= TileBottomLeft.GetArea().Y;
             bool BottomRightTileColision = TileBottomRight.TileInformation.IsColideable && BottomAreaRight.Y <= TileBottomRight.GetArea().Y;
@@ -401,9 +421,8 @@ namespace Waxer.GameLogic
                     newY = TileBottomRight.GetArea().Y - 32;
                 } 
 
-                
-                
                 Position.Y = newY;
+                _lastFriction = TileBottom.TileInformation.Friction;
                 PlayerHitGround();
             }
 
@@ -412,33 +431,44 @@ namespace Waxer.GameLogic
                 Position.Y += Force;
                 UpdateArea();
  
-                _gravityMultiplier += 16f * delta;
+                _gravityMultiplier += 16f * delta; 
 
+                _lastFriction = 0;
             }
- 
-            if (_isJumping && isColiding) { _isJumping = false; }
+
+            if (_isJumping && isColiding) 
+            { 
+                _isJumping = false; 
+            }
 
         }
 
+        internal void LimitPhysicsSpeed()
+        {
+            // Physics calculation maximum move speed
+            if (_moveAcceleration > Settings.MaximumMoveSpeed) { _moveAcceleration = Settings.MaximumMoveSpeed; } 
+   
+        }
+
+        float MovePosition;
         // Update left-right forces for movement
         void UpdateAppliedForces(float delta)
         {
-            // Physics calculation maximum move speed
-            if (MoveSpeed > 1024) { MoveSpeed = 1024; } 
- 
-            Force = Utils.ClampVector(Force, -1, 1); 
-            Vector2 ForceMultiplied = Force * MoveSpeed;
-            Vector2 NextStep = Position + (ForceMultiplied * delta);
-  
-  
+            LimitPhysicsSpeed();
+            
+            MovePosition = Math.Clamp(MovePosition, -1, 1);
+            float ForceMultiplied = MovePosition * _moveAcceleration;
+            
+            Vector2 NextStep = Position + new Vector2(ForceMultiplied * delta, 0);
+            
             // Right colision
             for(int i = 0; i < 16; i++)
             {
                 MapTile rightTile = World.GetTile(World.GetTilePosition(NextStep + new Vector2(i, 0)));
-                Rectangle rightArea = new Rectangle(((int)Position.X + 16) + i, (int)Position.Y, Area.Width, Area.Height);
+                Rectangle rightArea = new Rectangle(((int)Position.X + 15) + i, (int)Position.Y, Area.Width, Area.Height);
 
                 MapTile rightBottomTile = World.GetTile(World.GetTilePosition(NextStep + new Vector2(i, i)));
-                Rectangle rightBottomArea = new Rectangle(((int)Position.X + 16) + i, (int)Position.Y + i, Area.Width, Area.Height);
+                Rectangle rightBottomArea = new Rectangle(((int)Position.X + 15) + i, (int)Position.Y + i, Area.Width, Area.Height);
 
                 bool RightColision = rightTile.TileInformation.IsColideable && rightTile.GetArea().Intersects(rightArea);
                 bool RightBottomColision = rightBottomTile.TileInformation.IsColideable && rightBottomTile.GetArea().Intersects(rightBottomArea);
@@ -454,10 +484,10 @@ namespace Waxer.GameLogic
             for(int i = 0; i < 16; i++)
             {
                 MapTile leftTile = World.GetTile(World.GetTilePosition(NextStep - new Vector2(i, 0)));
-                Rectangle leftArea = new Rectangle(((int)Position.X - 16) - i, (int)Position.Y, Area.Width, Area.Height);
+                Rectangle leftArea = new Rectangle(((int)Position.X - 15) - i, (int)Position.Y, Area.Width, Area.Height);
 
                 MapTile leftBottomTile = World.GetTile(World.GetTilePosition(NextStep - new Vector2(i, -i)));
-                Rectangle leftBottomArea = new Rectangle(((int)Position.X - 16) - i, (int)Position.Y + i, Area.Width, Area.Height);
+                Rectangle leftBottomArea = new Rectangle(((int)Position.X - 15) - i, (int)Position.Y + i, Area.Width, Area.Height);
                 
                 bool LeftColision = leftTile.TileInformation.IsColideable && leftTile.GetArea().Intersects(leftArea);
                 bool LeftBottomColision = leftBottomTile.TileInformation.IsColideable && leftBottomTile.GetArea().Intersects(leftBottomArea);
@@ -502,14 +532,18 @@ namespace Waxer.GameLogic
             
             _aimVector = -(Position - (MouseInput.PositionVector2 - World.Camera.CameraPosition));
 
+            _deaceleration = (Acceleration * Math.Max(_lastFriction, 10));
+
             UpdateInput(delta);
-            GetTilesAround(Position);
-      
-            UpdateMoveSpeed(delta);
-            if (!_tileBehind.TileInformation.IsColideable) { UpdateAppliedForces(delta); }
+            
             UpdateJump(delta); 
             UpdateGravity(delta); 
- 
+            UpdateMoveSpeed(delta);
+
+
+            GetTilesAround(Position);
+            if (!_tileBehind.TileInformation.IsColideable) { UpdateAppliedForces(delta); }
+            
             _lastDelta = delta;
 
         }

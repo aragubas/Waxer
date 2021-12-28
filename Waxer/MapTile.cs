@@ -16,15 +16,17 @@ namespace Waxer
     {
         public int TileID;
         public bool IsColideable;
+        public float Friction = 0f;
         public string Name;
         public Texture2D Texture;
 
-        public TileInfo(int TileID, bool IsColideable, string Name, Texture2D Texture)
+        public TileInfo(int tileID, bool isColideable, float friction, string name, Texture2D texture)
         {
-            this.TileID = TileID;
-            this.Name = Name;
-            this.Texture = Texture;
-            this.IsColideable = IsColideable;
+            TileID = tileID;
+            IsColideable = isColideable;
+            Friction = friction;
+            Name = name;
+            Texture = texture;
         }
     }
 
@@ -36,8 +38,8 @@ namespace Waxer
         {
             TileInfos.Clear();
              
-            TileInfos.Add(0, new TileInfo(0, false, "Background Dirt", Graphics.Sprites.GetSprite("/tiles/0.png")));
-            TileInfos.Add(1, new TileInfo(1, true, "Dirt", Graphics.Sprites.GetSprite("/tiles/1.png")));
+            TileInfos.Add(0, new TileInfo(0, false, 0f, "Background Dirt", Graphics.Sprites.GetSprite("/tiles/0.png")));
+            TileInfos.Add(1, new TileInfo(1, true, 12f, "Dirt", Graphics.Sprites.GetSprite("/tiles/1.png")));
         }
 
     }

@@ -32,6 +32,7 @@ namespace Waxer
         
         //Physics
         public static float StableDelta = 0.017f;
+        public static float MaximumMoveSpeed = 1024;
 
     }
 }

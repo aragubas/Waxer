@@ -26,12 +26,12 @@ namespace Waxer
 			graphics = new GraphicsDeviceManager(this);
  
             IsFixedTimeStep = false;
-            //TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 144);
+            //TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 15);
       
             // Make sure its running with VSync 
-            graphics.SynchronizeWithVerticalRetrace = false;
+            graphics.SynchronizeWithVerticalRetrace = true;
             graphics.IsFullScreen = false; 
-            graphics.ApplyChanges(); 
+            graphics.ApplyChanges();
 
             Reference = this;
 		}
