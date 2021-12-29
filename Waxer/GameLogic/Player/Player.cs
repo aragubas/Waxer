@@ -79,6 +79,16 @@ namespace Waxer.GameLogic.Player
             }
         }
 
+        public bool AddItemInventory(Item item)
+        {
+            if (Inventory.Count > PlayerState.MaximumInventorySlots) { return false; }
+            
+            item.InventoryIndex = Inventory.Count;
+            Inventory.Add(item);
+            
+            return true;
+        }
+
         int LastScrollValue = 0;
         void UpdateInventorySelectedItemSlot()
         {

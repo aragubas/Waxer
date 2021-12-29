@@ -79,7 +79,6 @@ namespace Waxer.GameLogic
                         // A item placeable tile item has been found with the same TileID, increase quantity without creating new item on inventory
                         if (convertedItem.PlaceableTileInfo.TileID == PickItem.PlaceableTileInfo.TileID)
                         {
-                            Console.WriteLine("Increase Quantity");
                             QuantityIncreased = convertedItem.IncreaseStack(1);
                         }
                     }
@@ -87,9 +86,13 @@ namespace Waxer.GameLogic
 
                 if (!QuantityIncreased)
                 {  
-                    PickItem.InventoryIndex = World.Player.Inventory.Count;
-                    World.Player.Inventory.Add(PickItem);
-                    Console.WriteLine($"Add new item {World.Player.Inventory.Count}");
+                    bool ItemAdded = World.Player.AddItemInventory(PickItem);
+
+                    if (!ItemAdded)
+                    {
+                        return;
+                    }
+
                 }
 
 

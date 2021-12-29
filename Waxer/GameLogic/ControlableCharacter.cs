@@ -20,18 +20,17 @@ namespace Waxer.GameLogic
         public float MaximumSpeed = 196f;
         public float Acceleration = 1.8f;
         public float JumpMultiplier = 1f;
-        public float JumpHeight = 4f;
+        public float JumpHeight = 14f;
         public int Life = 300;
         private KeyboardState _oldState;
         internal Vector2 _aimVector = Vector2.Zero;
         internal float _gravityMultiplier = 0f;
         internal bool _isJumping = false;
         internal bool _jumpAvailable = true;
-        internal float _jumpProgress = 0f; 
-        internal float _jumpForce = 2f; 
+        internal float _jumpProgress = 0f;
         internal float _jumpAccumulatedForce = 0f; 
         internal bool _jumpEnding = false;
-        internal float _lastFriction = 0f; 
+        internal float _lastFriction = 0f;
         internal float _moveAcceleration = 0f;
         internal MapTile _tileUnderCursor = null;         
         internal MapTile _tileBehind = null;
@@ -276,7 +275,7 @@ namespace Waxer.GameLogic
                 // Instead of disabling jump 
                 if (_isJumping) 
                 { 
-                    StopJumping();
+                    EndJumping();
                 }
             }
 
@@ -292,7 +291,6 @@ namespace Waxer.GameLogic
  
             _oldState = newState;
         }
-
 
         void PlayerHitGround()
         {
@@ -323,7 +321,7 @@ namespace Waxer.GameLogic
         void UpdateJump(float delta)
         {
             bool isColiding = false;
-            float Force = (World.WorldEnvironment.Gravity * _jumpProgress) * delta;
+            float Force = _jumpProgress * delta;
             _ceiraText += $"\nJump Force {Force.ToString()}\nJumping: {_isJumping}\nAccumulated Force: {_jumpAccumulatedForce}"; 
              
             // Top colision detection
@@ -366,20 +364,17 @@ namespace Waxer.GameLogic
             }
             
             _ceiraText += $"\nJump Progress: {_jumpProgress}\nJump Ending: {_jumpEnding}";
-    
+            
             if (_isJumping)
             {
                 // Ending jumping if colliding
                 if (isColiding) { EndJumping(); return; }
- 
-                _jumpProgress += _jumpForce;
- 
-                if (_jumpForce < 0) { EndJumping(); }
+
+                _jumpProgress = _deaceleration * JumpHeight;
 
                 // Update player position
                 Position.Y -= Force;
             }
- 
         }
 
         // Update the constant down force, also called gravity
