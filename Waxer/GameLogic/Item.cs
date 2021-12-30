@@ -72,7 +72,7 @@ namespace Waxer.GameLogic
         {
             // DEBUG OPTION
             // Draw range box 
-            if (Settings.Debug_RenderItemsRangeBox)
+            if (Settings.Debug_RenderItemsRangeBox && Settings.DebugMode)
             {
                 spriteBatch.DrawCircle(new CircleF(World.Player.Position + World.Camera.CameraPosition, RangeOfUse), 32, Color.Red);
             }

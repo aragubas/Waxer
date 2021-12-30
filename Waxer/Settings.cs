@@ -17,7 +17,7 @@ namespace Waxer
     public static class Settings
     {
         public static float AnimationSpeed = 25f;
-        public static bool DebugMode = true;
+        public static bool DebugMode = false;
 
         public static string ContentFolder = $"{Environment.CurrentDirectory}\\Waxer_data\\";
         public static string FontsPath = ContentFolder + "fonts\\";

@@ -220,49 +220,6 @@ namespace Waxer.GameLogic
                 _moveAcceleration = 0;
                 EndJumping(); 
             }
- 
-
-
-
-
-
-            if (Utils.CheckKeyUp(_oldState, newState, Keys.F5))
-            {
-                GameMain.Reference.IsFixedTimeStep = true;
-                GameMain.Reference.TargetElapsedTime = TimeSpan.FromMilliseconds(1000 / 15);
-                
-                // Make sure its running with VSync 
-                GameMain.Reference.graphics.SynchronizeWithVerticalRetrace = false;
-                GameMain.Reference.graphics.ApplyChanges(); 
-
-                Console.WriteLine("15 fps lock");
-            }
- 
-            if (Utils.CheckKeyUp(_oldState, newState, Keys.F6))
-            {
-                GameMain.Reference.IsFixedTimeStep = false;
-                
-                // Make sure its running with VSync 
-                GameMain.Reference.graphics.SynchronizeWithVerticalRetrace = false;
-                GameMain.Reference.graphics.ApplyChanges(); 
-                Console.WriteLine("Unlimited fps lock");
-            }
-
-            if (Utils.CheckKeyUp(_oldState, newState, Keys.F7))
-            {
-                GameMain.Reference.IsFixedTimeStep = false;
-                
-                // Make sure its running with VSync 
-                GameMain.Reference.graphics.SynchronizeWithVerticalRetrace = true;
-                GameMain.Reference.graphics.ApplyChanges(); 
-                Console.WriteLine("VSYNC fps lock");
-            }
-
-
-
-
-
-
 
             if (Utils.CheckKeyDown(_oldState, newState, Keys.W))
             {
@@ -421,11 +378,15 @@ namespace Waxer.GameLogic
                 PlayerHitGround();
             }
 
+            // DEBUG: Debug Text
+            _ceiraText += $"\nGravityMultiplier: {_gravityMultiplier}";
+
             if (!isColiding) 
             { 
                 Position.Y += Force;
                 UpdateArea();
- 
+
+                // Increase Gravity Multiplier
                 _gravityMultiplier += 16f * delta; 
 
                 _lastFriction = 0;
@@ -534,8 +495,7 @@ namespace Waxer.GameLogic
             UpdateJump(delta); 
             UpdateGravity(delta); 
             UpdateMoveSpeed(delta);
-
-
+ 
             GetTilesAround(Position);
             if (!_tileBehind.TileInformation.IsColideable) { UpdateAppliedForces(delta); }
             
