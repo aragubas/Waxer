@@ -38,7 +38,10 @@ namespace Waxer
 
         protected override void Initialize()
         {
-			if (!Directory.Exists(Settings.ContentFolder)) { throw new DirectoryNotFoundException("Cannot find content folder."); }
+			if (!Directory.Exists(Settings.ContentFolder)) 
+            { 
+                throw new DirectoryNotFoundException("Cannot find content folder."); 
+            }
             
             spriteBatch = new SpriteBatch(GraphicsDevice);
 

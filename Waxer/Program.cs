@@ -14,7 +14,26 @@ namespace Waxer
 {
     public class Program
     {
-        public static void Main(string[] Args)
+        public static void Main(string[] args)
+        {
+            bool Summary = true;
+
+            foreach(string _switch in args)
+            {
+                if (_switch == "no-summary" || _switch == "--no-summary") { Summary = false; }
+            }
+
+            if (Summary)
+            {
+                WriteSummary();
+            }
+ 
+            // Creates a instance of game
+            Game game = new GameMain();
+            game.Run();
+        }
+
+        static void WriteSummary()
         {
             Console.WriteLine($"Waxer {Settings.VersionString} (Aragubas 2019-2022)");
             Console.WriteLine("-:Flags:");
@@ -29,10 +48,6 @@ namespace Waxer
             }
             
             Console.WriteLine("THIS RELEASE IS NOT ALLOWED FOR DISTRIBUTION NOR REVERSE ENGINNERING.");
- 
-            // Creates a instance of game
-            Game game = new GameMain();
-            game.Run();
         }
 
     }
