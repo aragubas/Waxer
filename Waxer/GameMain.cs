@@ -35,12 +35,12 @@ namespace Waxer
 
             Reference = this;
 		}
-
+ 
         protected override void Initialize()
         {
 			if (!Directory.Exists(Settings.ContentFolder)) 
             { 
-                throw new DirectoryNotFoundException("Cannot find content folder."); 
+                throw new DirectoryNotFoundException("Fatal Error!\nCannot find content folder."); 
             }
             
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -66,7 +66,7 @@ namespace Waxer
             MouseInput.Update();
 
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-             
+            
             // Limit the game to a stable "delta value"
             if (delta > Settings.StableDelta) 
             {

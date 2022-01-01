@@ -19,7 +19,7 @@ namespace Waxer
         public Rectangle Area;
         GameWorld ParentMap; 
         bool CheckChunks = false;
-            
+        
 
         public Chunk(Vector2 ChunkPosition, GameWorld ParentMap)
         {

@@ -77,6 +77,7 @@ namespace Waxer.GameLogic.Player.Inventory
   
             if (Area.Height > OneRowHeight) { NumberRowsToDraw = items.Count; }
 
+            // Draw every item in the visible inventory slots, except for the item being dragged
             for(int i = 0; i < NumberRowsToDraw; i++)
             {  
                 if (items[i].Index == MultipleRows_InventorySelectedItem && MulitpleRowsVisible)
@@ -90,6 +91,7 @@ namespace Waxer.GameLogic.Player.Inventory
                 }
             }
 
+            // Draw the current item being dragged, (if any)
             if (MultipleRows_InventorySelectedItem != -1)
             {
                 if (MultipleRows_InventorySelectedItem < items.Count)
