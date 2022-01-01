@@ -24,7 +24,7 @@ namespace Waxer.GameLogic.Items
             Name = $"{TileInfo.Name} [Placeable]";
         }
 
-        public override void DoAction(ItemUseContext context)
+        public override void DoAction(ItemUseContext context, float delta)
         {
             if (context.ActionMouseButton == MouseButton.Right_Up)
             {
@@ -36,7 +36,7 @@ namespace Waxer.GameLogic.Items
                     if (!tile.TileInformation.IsColideable)
                     {
                         World.SetTile(FixedMousePosition, PlaceableTileInfo);
-                        Stack--;
+                        Stack--; 
  
                         // Item needs deletion
                         if (Stack <= 0)
@@ -47,7 +47,7 @@ namespace Waxer.GameLogic.Items
                     }
                 }
 
-            }            
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch)

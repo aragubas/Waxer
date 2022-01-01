@@ -99,17 +99,17 @@ namespace Waxer.GameLogic.Player
             if (newMouseState.ScrollWheelValue - LastScrollValue >= 1)
             {
                 DeactivateSelectedItem();
-                SelectedInventoryItem++;
+                SelectedInventoryItem--;
 
-                if (SelectedInventoryItem > 9) { SelectedInventoryItem = 0; }
+                if (SelectedInventoryItem < 0) { SelectedInventoryItem = 9; }
             }
 
             if (newMouseState.ScrollWheelValue - LastScrollValue <= -1)
             {
                 DeactivateSelectedItem();
-                SelectedInventoryItem--;
+                SelectedInventoryItem++;
 
-                if (SelectedInventoryItem < 0) { SelectedInventoryItem = 9; }
+                if (SelectedInventoryItem > 9) { SelectedInventoryItem = 0; }
             }
 
             LastScrollValue = newMouseState.ScrollWheelValue;
@@ -206,27 +206,43 @@ namespace Waxer.GameLogic.Player
                         Rectangle FixedArea = new Rectangle(_tileUnderCursor.GetArea().X + (int)World.Camera.CameraPosition.X,
                             _tileUnderCursor.GetArea().Y + (int)World.Camera.CameraPosition.Y, 32, 32);
 
+                        if (MouseInput.Position.Intersects(FixedArea))
+                        {
+                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.MouseHover, MouseInput.PositionVector2, World), delta);
+
+                        }
+  
                         if (MouseInput.Left_UpClickPos.Intersects(FixedArea))
                         {
-                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Left_Up, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Left_Up, MouseInput.PositionVector2, World), delta);
+                            break;
+
                         }
 
                         if (MouseInput.Right_UpClickPos.Intersects(FixedArea)) 
                         {
-                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Right_Up, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Right_Up, MouseInput.PositionVector2, World), delta);
+                            break;
+
                         }
 
                         if (MouseInput.Left_DownClickPos.Intersects(FixedArea))
                         {
-                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Left_Down, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Left_Down, MouseInput.PositionVector2, World), delta);
+                            break;
+
                         }
 
                         if (MouseInput.Right_DownClickPos.Intersects(FixedArea))
                         {
-                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Right_Down, MouseInput.PositionVector2, World));
+                            Inventory[i].DoAction(new ItemUseContext(_tileUnderCursor.TilePosition, new Vector2(FixedArea.X, FixedArea.Y), Position + World.Camera.CameraPosition, _tileBehind.TilePosition, MouseButton.Right_Down, MouseInput.PositionVector2, World), delta);
+                            break;
+
                         }
                         
                     }
+
+                    break;
                 }
 
             }            

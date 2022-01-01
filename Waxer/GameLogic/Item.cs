@@ -19,6 +19,7 @@ namespace Waxer.GameLogic
     {
         Left_Down, Left_Up,
         Right_Down, Right_Up,
+        MouseHover
     }
 
     public struct ItemUseContext
@@ -63,7 +64,7 @@ namespace Waxer.GameLogic
             this.InventoryIndex = InventoryIndex;
         }
 
-        public virtual void DoAction(ItemUseContext context)
+        public virtual void DoAction(ItemUseContext context, float delta)
         {
             
         }

@@ -16,8 +16,13 @@ namespace Waxer
 {
     public static class Settings
     {
+        // Information
+        public static string DevelopmentBranch = "pre-alpha";
+        public static string Version = "1.0";
+        public static string VersionString = $"{Version}_{DevelopmentBranch}";
+
         public static float AnimationSpeed = 25f;
-        public static bool DebugMode = false;
+        public static bool DebugMode = true;
 
         public static string ContentFolder = $"{Environment.CurrentDirectory}\\Waxer_data\\";
         public static string FontsPath = ContentFolder + "fonts\\";

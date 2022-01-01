@@ -6,6 +6,7 @@
     Written by Paulo Otávio <vaiogames18@gmail.com> or <dpaulootavio5@outlook.com>, December 24, 2021
 */
 
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,14 +19,16 @@ namespace Waxer
         public bool IsColideable;
         public float Friction = 0f;
         public string Name;
+        public float BreakTime;
         public Texture2D Texture;
 
-        public TileInfo(int tileID, bool isColideable, float friction, string name, Texture2D texture)
+        public TileInfo(int tileID, bool isColideable, float friction, string name, float breakTime, Texture2D texture)
         {
             TileID = tileID;
             IsColideable = isColideable;
             Friction = friction;
             Name = name;
+            BreakTime = breakTime;
             Texture = texture;
         }
     }
@@ -38,8 +41,8 @@ namespace Waxer
         {
             TileInfos.Clear();
              
-            TileInfos.Add(0, new TileInfo(0, false, 0f, "Background Dirt", Graphics.Sprites.GetSprite("/tiles/0.png")));
-            TileInfos.Add(1, new TileInfo(1, true, 12f, "Dirt", Graphics.Sprites.GetSprite("/tiles/1.png")));
+            TileInfos.Add(0, new TileInfo(0, false, 0f, "Background Dirt", 0, Graphics.Sprites.GetSprite("/tiles/0.png")));
+            TileInfos.Add(1, new TileInfo(1, true, 12f, "Dirt", 0.1f, Graphics.Sprites.GetSprite("/tiles/1.png")));
         }
 
     }
@@ -52,6 +55,7 @@ namespace Waxer
         int TileID = 0;
         Color BlendColor = Color.White;
         public Chunk ParentChunk;
+        public string TileUID = Guid.NewGuid().ToString();
 
         public MapTile(Chunk ParentChunk, Vector2 TilePosition, Vector2 ScreenPosition, int TileID)
         {

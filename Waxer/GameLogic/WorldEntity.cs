@@ -48,6 +48,19 @@ namespace Waxer.GameLogic
 
             }
         }
+        
+        internal void UpdateArea(int xOffset)
+        {
+            if (AreaSize == new Vector2(-1, -1))
+            {
+                Area = new Rectangle((int)Position.X + xOffset, (int)Position.Y, Texture.Width, Texture.Height);
+                 
+            }else
+            {
+                Area = new Rectangle((int)Position.X + xOffset, (int)Position.Y, (int)AreaSize.X, (int)AreaSize.Y); 
+
+            }
+        }
 
         public virtual void Update(float delta) 
         { 

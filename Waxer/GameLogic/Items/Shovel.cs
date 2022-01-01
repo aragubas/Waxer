@@ -17,10 +17,12 @@ namespace Waxer.GameLogic.Items
     {
         public Vector2 sinasPos = Vector2.Zero;
         public Texture2D IngameTexture;
-        bool UseAnimation = false;
-        float Rotation = 0f;
-        bool RightSide = true;
-
+        bool _useAnimation = false;
+        float _rotation = 0f;
+        bool _rightSide = true;
+        string _lastTileGUID = "";
+        float _breakTime = 0;
+        float _rotationSpeed = 400;
 
         public Shovel(GameWorld World, int InventoryIndex) : base(World, InventoryIndex)
         {
@@ -32,26 +34,55 @@ namespace Waxer.GameLogic.Items
             Description = "Dig... dig... dig...";
         } 
 
-        public override void DoAction(ItemUseContext context)
+        public override void DoAction(ItemUseContext context, float delta)
         {
-            if (context.ActionMouseButton == MouseButton.Left_Up)
+            if (context.ActionMouseButton == MouseButton.Left_Down || context.ActionMouseButton == MouseButton.MouseHover)
             {
                 sinasPos = context.PlayerScreenPosition;
 
                 if (IsInRange(context.PlayerScreenPosition, context.MousePosition))
                 {
                     MapTile tile = context.World.GetTile(context.World.GetTilePosition(context.MousePosition - context.World.Camera.CameraPosition));
-                    
+                     
                     if (tile != null)
                     { 
-                        if (tile.TileInformation.IsColideable)
+                        if (tile.TileUID != _lastTileGUID)
                         {
-                            PlaceableTileItem tileItem = new PlaceableTileItem(World, tile.TileInformation);
-                            World.Entities.Add(new PickableItem(World, tileItem, context.UseWorldPosition * 32)); 
+                            _breakTime = 0;
+                            _lastTileGUID = "";
+                            StopUseAnimation();
 
-                            context.World.SetTile(tile.TilePosition, TilesInfo.TileInfos[0]);
-                            SetUpUseAnimation();
-                            RightSide = (context.MousePosition - context.PlayerScreenPosition).X >= 0;
+                        }
+ 
+                        if (tile.TileInformation.IsColideable && context.ActionMouseButton == MouseButton.Left_Down)
+                        {
+                            if (_lastTileGUID != tile.TileUID)
+                            {
+                                _lastTileGUID = tile.TileUID;
+                                _breakTime = 0; 
+                                SetUpUseAnimation();
+
+                            }
+
+                            if (_lastTileGUID == tile.TileUID)
+                            {
+                                _breakTime += delta * 1;
+                                
+                                _rightSide = (context.MousePosition - context.PlayerScreenPosition).X >= 0; 
+
+                                if (_breakTime >= tile.TileInformation.BreakTime)
+                                {
+                                    PlaceableTileItem tileItem = new PlaceableTileItem(World, tile.TileInformation);
+                                    World.Entities.Add(new PickableItem(World, tileItem, context.UseWorldPosition * 32)); 
+
+                                    context.World.SetTile(tile.TilePosition, TilesInfo.TileInfos[0]);
+                                    
+                                    _breakTime = 0;
+                                    _lastTileGUID = "";
+                                    StopUseAnimation();
+                                }
+ 
+                            }
 
                         }
                     }
@@ -64,45 +95,57 @@ namespace Waxer.GameLogic.Items
         {
             base.Draw(spriteBatch);
 
-            if (UseAnimation)
+            if (_useAnimation)
             {   
                 SpriteEffects effects = SpriteEffects.None;
-                float OldRotation = Rotation;
+                float OldRotation = _rotation;
                 
-                if (!RightSide)
+                if (!_rightSide)
                 {
                     effects = SpriteEffects.FlipHorizontally;       
-                    Rotation = -Rotation;
+                    _rotation = -_rotation;
                 } 
 
-                spriteBatch.Draw(IngameTexture, World.Player.Position + World.Camera.CameraPosition, null, Color.White, MathHelper.ToRadians(Rotation), new Vector2(IngameTexture.Width / 2, IngameTexture.Height / 2), 1f, effects, 1f);
+                spriteBatch.Draw(IngameTexture, World.Player.Position + World.Camera.CameraPosition, null, Color.White, MathHelper.ToRadians(_rotation), new Vector2(IngameTexture.Width / 2, IngameTexture.Height / 2), 1f, effects, 1f);
 
-                Rotation = OldRotation; 
+                _rotation = OldRotation; 
             }
         }
         
         public override void Deactivate()
         {
-            UseAnimation = false;
-            Rotation = 0;
+            _useAnimation = false;
+            _rotation = 0;
         }
 
         void SetUpUseAnimation()
         {
-            UseAnimation = true;
-            Rotation = 0;
+            _useAnimation = true;
+            _rotation = 0;
+        }
+
+        void StopUseAnimation()
+        {
+            _useAnimation = false;
+            _rotation = 0;
         }
 
         public override void Update(float delta)
         {
-            if (UseAnimation)
+            if (_useAnimation)
             {
-                Rotation += 500 * delta;
+                _rotation += _rotationSpeed * delta;
 
-                if (Rotation >= 100)
+                if (_rotation >= 90)
                 {
-                    UseAnimation = false;
-                    Rotation = 0;
+                    //UseAnimation = false;
+                    _rotationSpeed = -800;
+                }
+                
+                if (_rotation <= 0)
+                {
+                    _rotationSpeed = 500;
+
                 }
             }
 

@@ -7,6 +7,7 @@
 */
 
 using Microsoft.Xna.Framework;
+using System;
 using MonoGame.Framework;
 
 namespace Waxer
@@ -15,10 +16,25 @@ namespace Waxer
     {
         public static void Main(string[] Args)
         {
+            Console.WriteLine($"Waxer {Settings.VersionString} (Aragubas 2019-2022)");
+            Console.WriteLine("-:Flags:");
+
+            // Write Debug Mode Flags
+            if (Settings.DebugMode) 
+            { 
+                Console.WriteLine("--DebugMode"); 
+                if (Settings.Debug_RenderColidersTiles) { Console.WriteLine("---DebugRenderColiderTiles"); }
+                if (Settings.Debug_RenderItemsRangeBox) { Console.WriteLine("---DebugRenderItemsRangeBox"); }
+                if (Settings.Debug_RenderPlayerPositionPoints) { Console.WriteLine("---DebugRenderPlayerPositionPoints"); }
+            }
+            
+            Console.WriteLine("THIS RELEASE IS NOT ALLOWED FOR DISTRIBUTION NOR REVERSE ENGINNERING.");
+ 
             // Creates a instance of game
             Game game = new GameMain();
             game.Run();
         }
+
     }
 }
 

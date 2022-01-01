@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using Waxer.Animation;
 using Waxer.GameLogic.Items;
 
@@ -41,19 +42,19 @@ namespace Waxer.GameLogic
                 colorValues.Add(i, newFlasher);
             }
 
-            SpriteOrigin = new Vector2(0, 0);
+            SpriteOrigin = new Vector2(-16, 0);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(Texture, Area, null, BlendColor, SpriteRotation, SpriteOrigin, SpriteEffects, SpriteLayerDepth);
         }
-
+  
         public override void Update(float delta)
         {
             UpdateArea();
             UpdateBody(delta);
-            
+             
             if (!Pickable)
             {
                 PickDelay += 1 * delta;
@@ -64,7 +65,8 @@ namespace Waxer.GameLogic
                 }
             }
 
-            if (Area.Intersects(World.Player.Area) && Pickable)
+            Rectangle colArea = new Rectangle(Area.X + 16, Area.Y, Area.Width, Area.Height);
+            if (colArea.Intersects(new Rectangle(World.Player.Area.X - 16, World.Player.Area.Y, World.Player.Area.Width + 16, World.Player.Area.Height)) && Pickable)
             {
                 Picked = true;
                 
@@ -72,6 +74,7 @@ namespace Waxer.GameLogic
 
                 foreach(Item item in World.Player.Inventory)
                 {
+                    // Check if item is the same type
                     if (item.GetType() == typeof(PlaceableTileItem))
                     {
                         PlaceableTileItem convertedItem = (PlaceableTileItem)item;
@@ -80,7 +83,7 @@ namespace Waxer.GameLogic
                         if (convertedItem.PlaceableTileInfo.TileID == PickItem.PlaceableTileInfo.TileID)
                         {
                             QuantityIncreased = convertedItem.IncreaseStack(1);
-                        }
+                        } 
                     }
                 }
 
@@ -99,8 +102,8 @@ namespace Waxer.GameLogic
                 Dispose();
                 return;
             }
-
- 
+  
+            // Update all color flashers
             foreach(ColorFlasher flasher in colorValues.Values)
             {
                 flasher.Update(delta);
