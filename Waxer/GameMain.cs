@@ -53,6 +53,8 @@ namespace Waxer
 
             // Creates a new game map
             gameMap = new GameWorld();
+
+
 		}
 
         protected override void Update(GameTime gameTime)
@@ -77,9 +79,12 @@ namespace Waxer
  
             // Draw the game map and entities
             gameMap.Draw(spriteBatch);
- 
+
             // Draw mouse cursor
 			cursorRender.Draw(spriteBatch);
+
+
+
         }
 
     }

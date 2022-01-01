@@ -33,7 +33,7 @@ namespace Waxer.GameLogic.Items
             Name = "Shovel";
             Description = "Dig... dig... dig...";
         }
-
+ 
         public override void DoAction(ItemUseContext context, float delta)
         {
             if (context.ActionMouseButton == MouseButton.Left_Down || context.ActionMouseButton == MouseButton.MouseHover)

@@ -29,7 +29,7 @@ namespace Waxer.GameLogic
             this.World = World;
             this.PickItem = PickItem;
             this.Position = Position;
-            AreaSize = new Vector2(16, 16);
+            AreaSize = new Vector2(32, 32);
             UpdateArea();            
 
             Texture = PickItem.IconTexture;
@@ -42,14 +42,15 @@ namespace Waxer.GameLogic
                 colorValues.Add(i, newFlasher);
             }
 
-            SpriteOrigin = new Vector2(-16, 0);
+            SpriteOrigin = new Vector2(-16, -32);
         }
-
+ 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Texture, Area, null, BlendColor, SpriteRotation, SpriteOrigin, SpriteEffects, SpriteLayerDepth);
+
+            spriteBatch.Draw(Texture, new Rectangle(Area.X, Area.Y, 16, 16), null, BlendColor, SpriteRotation, SpriteOrigin, SpriteEffects, SpriteLayerDepth);
         }
-  
+            
         public override void Update(float delta)
         {
             UpdateArea();

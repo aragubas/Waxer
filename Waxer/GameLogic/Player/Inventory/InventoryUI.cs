@@ -82,17 +82,8 @@ namespace Waxer.GameLogic.Player.Inventory
             {  
                 if (items[i].Index == MultipleRows_InventorySelectedItem && MulitpleRowsVisible)
                 {
-                    // Draw red square on its original position
-                    spriteBatch.DrawRectangle(items[i].Area, Color.White);
- 
-                    // Back up the original area, change area position to Mouse Position 
-                    Rectangle OldItemRect = items[i].Area;
-                    items[i].Area = new Rectangle(MouseInput.Position.X - Area.X, MouseInput.Position.Y - Area.Y, items[i].Area.Width, items[i].Area.Height);
- 
-                    items[i].Draw(spriteBatch); 
+                    continue;
 
-                    // Restore the original area
-                    items[i].Area = OldItemRect; 
                 }else
                 {
                     items[i].Draw(spriteBatch); 
@@ -100,9 +91,23 @@ namespace Waxer.GameLogic.Player.Inventory
                 }
             }
 
-            if (SelectedItemIndex != -1)
+            if (MultipleRows_InventorySelectedItem != -1)
             {
+                if (MultipleRows_InventorySelectedItem < items.Count)
+                {
+                    // Draw red square on its original position
+                    spriteBatch.DrawRectangle(items[MultipleRows_InventorySelectedItem].Area, Color.White);
 
+                    // Back up the original area, change area position to Mouse Position 
+                    Rectangle OldItemRect = items[MultipleRows_InventorySelectedItem].Area;
+                    items[MultipleRows_InventorySelectedItem].Area = new Rectangle(MouseInput.Position.X - Area.X, MouseInput.Position.Y - Area.Y, items[MultipleRows_InventorySelectedItem].Area.Width, items[MultipleRows_InventorySelectedItem].Area.Height);
+ 
+                    items[MultipleRows_InventorySelectedItem].Draw(spriteBatch); 
+ 
+                    // Restore the original area
+                    items[MultipleRows_InventorySelectedItem].Area = OldItemRect; 
+
+                }
             }
 
             spriteBatch.End();
@@ -274,7 +279,7 @@ namespace Waxer.GameLogic.Player.Inventory
 
             FullInventoryToggleKey();
             UpdateInventoryItems(delta);
- 
+
             if (MulitpleRowsVisible) 
             {
                 if (MultipleRows_InventoryItemBeingHovered < items.Count && MultipleRows_InventoryItemBeingHovered >= 0)
