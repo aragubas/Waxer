@@ -37,6 +37,7 @@ namespace Waxer
         public SpriteFont DebugFont;
         public Vector2 DebugFontSize;
         public Dictionary<Vector2, Chunk> Chunks = new();
+        public int Seed;
         InventoryUI inventoryUI;
 
         public GameWorld()
@@ -44,6 +45,10 @@ namespace Waxer
             Properties = new MapProperties();
             Properties.TileSize = new Vector2(32, 32);
             
+            Random rand = new Random();
+            
+            Seed = rand.Next(int.MinValue, int.MaxValue);
+
             Chunk initialChunk = new Chunk(new Vector2(0, 0), this);
             Chunks.Add(new Vector2(0, 0), initialChunk);
  

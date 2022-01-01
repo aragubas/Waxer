@@ -3,3 +3,4 @@ Production/*
 Waxer/obj/*
 Waxer/bin/*
 *.old
+Source Graphics/Gif Export/**

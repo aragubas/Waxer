@@ -10,6 +10,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using Waxer.GameLogic.Entities;
 
 namespace Waxer.GameLogic.Items
 {

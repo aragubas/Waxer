@@ -71,12 +71,6 @@ namespace Waxer
             return ColorToReturn;
         }
 
-        public static int Interpolate(int Input, int Source, float delta)
-        {
-            float smooth = (float)(Settings.AnimationSpeed * delta);
-            return (int)MathHelper.SmoothStep(Source, Input, smooth);
-        }
-
         /// <summary>
         /// Wraps the text.
         /// </summary>

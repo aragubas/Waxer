@@ -14,7 +14,7 @@ using MonoGame.Extended;
 using Waxer.Animation;
 using Waxer.GameLogic.Items;
 
-namespace Waxer.GameLogic
+namespace Waxer.GameLogic.Entities
 {
     public class PickableItem : RigidBody
     {
@@ -103,7 +103,7 @@ namespace Waxer.GameLogic
                 Dispose();
                 return;
             }
-  
+
             // Update all color flashers
             foreach(ColorFlasher flasher in colorValues.Values)
             {
