@@ -9,7 +9,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
- 
+
 namespace Waxer.GameLogic.Items
 {
     public class PlaceableTileItem : Item

@@ -31,7 +31,7 @@ namespace Waxer.GameLogic
             this.Position = Position;
             AreaSize = new Vector2(16, 16);
             UpdateArea();            
-            
+
             Texture = PickItem.IconTexture;
 
             for(int i = 0; i < 3; i++)
@@ -54,7 +54,7 @@ namespace Waxer.GameLogic
         {
             UpdateArea();
             UpdateBody(delta);
-             
+                    
             if (!Pickable)
             {
                 PickDelay += 1 * delta;
@@ -64,7 +64,7 @@ namespace Waxer.GameLogic
                     Pickable = true;
                 }
             }
-
+  
             Rectangle colArea = new Rectangle(Area.X + 16, Area.Y, Area.Width, Area.Height);
             if (colArea.Intersects(new Rectangle(World.Player.Area.X - 16, World.Player.Area.Y, World.Player.Area.Width + 16, World.Player.Area.Height)) && Pickable)
             {

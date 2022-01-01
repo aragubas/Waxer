@@ -40,8 +40,8 @@ namespace Waxer.GameLogic
         internal Rectangle _ceiraRect = Rectangle.Empty; 
         internal string _ceiraText = "";
         internal float _deaceleration = 0;
-
         internal float _lastDelta = 0.0f;
+        
 
         #region DEBUG AREA
         // == DEBUG AREA ==
@@ -280,7 +280,7 @@ namespace Waxer.GameLogic
             bool isColiding = false;
             float Force = _jumpProgress * delta;
             _ceiraText += $"\nJump Force {Force.ToString()}\nJumping: {_isJumping}\nAccumulated Force: {_jumpAccumulatedForce}"; 
-             
+            
             // Top colision detection
             Vector2 nextPosition = new Vector2(Position.X, Position.Y - Force);
             Rectangle TopArea = new Rectangle((int)Position.X, (int)nextPosition.Y, Area.Width, Area.Height);
@@ -381,13 +381,13 @@ namespace Waxer.GameLogic
             // DEBUG: Debug Text
             _ceiraText += $"\nGravityMultiplier: {_gravityMultiplier}";
 
-            if (!isColiding) 
+            if (!isColiding)
             { 
                 Position.Y += Force;
                 UpdateArea();
 
                 // Increase Gravity Multiplier
-                _gravityMultiplier += 16f * delta; 
+                _gravityMultiplier += 16 * delta; 
 
                 _lastFriction = 0;
             }
@@ -485,7 +485,7 @@ namespace Waxer.GameLogic
             {
                 BlendColor.B += Convert.ToByte((2f * delta * 255));
             }            
-            
+             
             _aimVector = -(Position - (MouseInput.PositionVector2 - World.Camera.CameraPosition));
 
             _deaceleration = (Acceleration * Math.Max(_lastFriction, 10));

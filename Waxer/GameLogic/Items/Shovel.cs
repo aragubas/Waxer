@@ -23,7 +23,7 @@ namespace Waxer.GameLogic.Items
         string _lastTileGUID = "";
         float _breakTime = 0;
         float _rotationSpeed = 400;
-
+ 
         public Shovel(GameWorld World, int InventoryIndex) : base(World, InventoryIndex)
         {
             this.World = World;
@@ -32,7 +32,7 @@ namespace Waxer.GameLogic.Items
             StackSize = 8;
             Name = "Shovel";
             Description = "Dig... dig... dig...";
-        } 
+        }
 
         public override void DoAction(ItemUseContext context, float delta)
         {
@@ -53,7 +53,7 @@ namespace Waxer.GameLogic.Items
                             StopUseAnimation();
 
                         }
- 
+
                         if (tile.TileInformation.IsColideable && context.ActionMouseButton == MouseButton.Left_Down)
                         {
                             if (_lastTileGUID != tile.TileUID)
@@ -88,7 +88,14 @@ namespace Waxer.GameLogic.Items
                     }
                 }
             
+            } 
+            
+            if (context.ActionMouseButton == MouseButton.Left_Up)
+            {
+                StopUseAnimation();
             }
+
+
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -128,8 +135,9 @@ namespace Waxer.GameLogic.Items
         {
             _useAnimation = false;
             _rotation = 0;
+            _breakTime = 0;
         }
-
+ 
         public override void Update(float delta)
         {
             if (_useAnimation)
