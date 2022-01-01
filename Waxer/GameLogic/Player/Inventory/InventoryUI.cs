@@ -74,8 +74,7 @@ namespace Waxer.GameLogic.Player.Inventory
             DrawBackground(spriteBatch);
 
             int NumberRowsToDraw = 10;
-            int SelectedItemIndex = -1;
-
+  
             if (Area.Height > OneRowHeight) { NumberRowsToDraw = items.Count; }
 
             for(int i = 0; i < NumberRowsToDraw; i++)

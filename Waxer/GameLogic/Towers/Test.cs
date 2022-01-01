@@ -12,7 +12,7 @@ using MonoGame.Extended;
 
 namespace Waxer.GameLogic.Towers
 {
-    public class Test : TowerBase
+    public class Test : RigidBody
     { 
         float ShootDelay = 0;
         public int ShootingDelaySeconds = 3;
@@ -38,6 +38,8 @@ namespace Waxer.GameLogic.Towers
         public override void Update(float delta)
         {
             base.Update(delta);
+            UpdateBody(delta);
+            
             ShootDelay -= 1 * delta;
             if (ShootDelay < 0) 
             { 
@@ -50,27 +52,6 @@ namespace Waxer.GameLogic.Towers
             {
                 CanShoot = false;
                 Shoot();
-            }
-
-            try
-            {
-                MapTile tileUnder = World.GetTile(World.GetTilePosition(Position) - -Vector2.UnitY);
-                
-                if (!tileUnder.TileInformation.IsColideable)
-                {
-                    Position.Y += (World.WorldEnvironment.Gravity * GravityMultiplier) * delta;
-
-                    GravityMultiplier += 16f * delta;
-
-
-                }else  // Player hits the ground
-                { 
-                    GravityMultiplier = 0f; 
-                }
-
-            }catch(System.Collections.Generic.KeyNotFoundException)
-            {
-                Position = Vector2.Zero;
             }
 
         }

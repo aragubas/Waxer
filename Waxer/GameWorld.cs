@@ -38,7 +38,7 @@ namespace Waxer
         public Vector2 DebugFontSize;
         public Dictionary<Vector2, Chunk> Chunks = new();
         InventoryUI inventoryUI;
- 
+
         public GameWorld()
         {
             Properties = new MapProperties();
@@ -48,7 +48,7 @@ namespace Waxer
             Chunks.Add(new Vector2(0, 0), initialChunk);
  
             Player = new PlayerEntity(new Vector2(8  * 32, 10 * 32), this);
-            Entities.Add(new GameLogic.Towers.Test(new Vector2(4 * 32, 9 * 32), this));
+            Entities.Add(new GameLogic.Towers.Test(new Vector2(4 * 32, 10 * 32), this));
             
             inventoryUI = new InventoryUI(Player);
 

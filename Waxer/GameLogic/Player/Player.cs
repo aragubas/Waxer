@@ -28,7 +28,7 @@ namespace Waxer.GameLogic.Player
         {
             Position = initialPosition;
             World = parentMap;
- 
+  
             // Set SpriteOrigin to Bottom Center
             SpriteOrigin = new Vector2(16, 0);
 

@@ -44,7 +44,7 @@ namespace Waxer.GameLogic
 
             SpriteOrigin = new Vector2(-16, -32);
         }
- 
+
         public override void Draw(SpriteBatch spriteBatch)
         {
 

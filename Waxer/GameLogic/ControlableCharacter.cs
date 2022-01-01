@@ -182,7 +182,7 @@ namespace Waxer.GameLogic
         //
         internal void UpdateChracter(float delta)
         {
-             
+            
             if (BlendColor.G < 255)
             {
                 BlendColor.G += Convert.ToByte((2f * delta * 255));
@@ -192,7 +192,7 @@ namespace Waxer.GameLogic
             {
                 BlendColor.B += Convert.ToByte((2f * delta * 255));
             }            
-             
+            
             _aimVector = -(Position - (MouseInput.PositionVector2 - World.Camera.CameraPosition));
 
             _deaceleration = (Acceleration * Math.Max(_lastFriction, 10));
