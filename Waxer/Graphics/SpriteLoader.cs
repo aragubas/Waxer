@@ -42,8 +42,8 @@ namespace Waxer.Graphics
             {
                 FileInfo info = new FileInfo(file);
                 if (info.Extension != ".png") { continue; }
-                string FileFullName = info.FullName;
-                string SpriteFiltedName = FileFullName.Replace(Settings.ImagePath, "/").Replace("\\", "/");
+                string FileFullName = info.FullName;                
+                string SpriteFiltedName = Path.GetRelativePath(Settings.ImagePath, info.FullName).Replace("\\", "/").Insert(0, "/");
     
                 if (!LoadedSprites.ContainsKey(SpriteFiltedName))
                 {
@@ -68,7 +68,7 @@ namespace Waxer.Graphics
 
             if (!SpriteName.EndsWith(".png")) { filtredSpriteName = filtredSpriteName.Insert(filtredSpriteName.Length - 1, ".png"); }
             if (!SpriteName.StartsWith("/")) { filtredSpriteName = filtredSpriteName.Insert(0, "/"); }
-            if (!LoadedSprites.ContainsKey(filtredSpriteName)) { return MissingTexture; }
+            if (!LoadedSprites.ContainsKey(filtredSpriteName)) { Console.WriteLine($"Texture not found: {SpriteName}"); return MissingTexture; }
  
             return LoadedSprites[filtredSpriteName];
         }

@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,11 +25,11 @@ namespace Waxer
         public static float AnimationSpeed = 25f;
         public static bool DebugMode = true;
 
-        public static string ContentFolder = $"{Environment.CurrentDirectory}\\Waxer_data\\";
-        public static string FontsPath = ContentFolder + "fonts\\";
-        public static string ImagePath = ContentFolder + "img\\";
-        public static string SoundPath = ContentFolder + "sound\\";
-        public static string ConfigPath = ContentFolder + "config\\";
+        public static string ContentFolder = Path.Combine(Environment.CurrentDirectory, "Waxer_data");
+        public static string FontsPath = Path.Combine(ContentFolder, "fonts");
+        public static string ImagePath = Path.Combine(ContentFolder, "img");
+        public static string SoundPath = Path.Combine(ContentFolder, "sound");
+        public static string DataPath = Path.Combine(ContentFolder, "data");
         
         // Debug options 
         public static bool Debug_RenderColidersTiles = true;

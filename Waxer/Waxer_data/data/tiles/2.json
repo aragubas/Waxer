@@ -1,0 +1,8 @@
+{
+    "id": 2,
+    "colideable": true,
+    "speedAcceleration": 1.3,
+    "name": "Concrete Flooring",
+    "breakTime": 0.65,
+    "texturePath": "/tiles/2.png"
+}

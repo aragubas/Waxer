@@ -1,0 +1,8 @@
+{
+    "id": 1,
+    "colideable": true,
+    "speedAcceleration": 1,
+    "name": "Dirt",
+    "breakTime": 0.15,
+    "texturePath": "/tiles/1.png"
+}

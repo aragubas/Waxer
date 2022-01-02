@@ -1,0 +1,8 @@
+{
+    "id": 0,
+    "colideable": false,
+    "speedAcceleration": 1,
+    "name": "Background Dirt",
+    "breakTime": 0,
+    "texturePath": "/tiles/0.png"
+}

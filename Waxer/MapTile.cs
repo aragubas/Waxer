@@ -8,8 +8,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 
 namespace Waxer
 {
@@ -17,7 +19,7 @@ namespace Waxer
     {
         public int TileID;
         public bool IsColideable;
-        public float SpeedAcceleration = 0f;
+        public float SpeedAcceleration = 1f;
         public string Name;
         public float BreakTime;
         public Texture2D Texture;
@@ -32,20 +34,71 @@ namespace Waxer
             Texture = texture;
         }
     }
-
+    
     public static class TilesInfo
     {
         public static Dictionary<int, TileInfo> TileInfos = new Dictionary<int, TileInfo>();
 
+        #pragma warning disable 0649
+        struct JsnTile
+        {
+            [JsonProperty("id")]
+            public int ID;
+ 
+            [JsonProperty("colideable")]
+            public bool Colideable;
+
+            [JsonProperty("speedAcceleration")]
+            public float SpeedAcceleration;
+
+            [JsonProperty("name")]
+            public string Name;
+
+            [JsonProperty("breakTime")]
+            public float BreakTime;
+
+            [JsonProperty("texturePath")]
+            public string TexturePath;
+            
+        }
+        #pragma warning restore 0649
+
         public static void LoadTileInfos()
         {
             TileInfos.Clear();
-             
-            TileInfos.Add(0, new TileInfo(0, false, 1f, "Background Dirt", 0, Graphics.Sprites.GetSprite("/tiles/0.png")));
-            TileInfos.Add(1, new TileInfo(1, true, 1f, "Dirt", 0.1f, Graphics.Sprites.GetSprite("/tiles/1.png")));
-            TileInfos.Add(2, new TileInfo(2, true, 1.4f, "Concrete Flooring", 0.7f, Graphics.Sprites.GetSprite("/tiles/2.png")));
+            
+            // Get all json files in the tile folders inside data
+            DirectoryInfo dirInfo = new DirectoryInfo(Path.Combine(Settings.DataPath, "tiles/"));
+            FileInfo[] files = dirInfo.GetFiles("*.json", SearchOption.AllDirectories);
+
+            foreach(FileInfo tileFile in files)
+            {
+                try
+                {
+                    string strJson = File.ReadAllText(tileFile.FullName);
+
+                    JsnTile jsonTile = JsonConvert.DeserializeObject<JsnTile>(strJson);
+                    TileInfo newTile = new TileInfo(jsonTile.ID, jsonTile.Colideable, jsonTile.SpeedAcceleration, jsonTile.Name,
+                                                    jsonTile.BreakTime, Graphics.Sprites.GetSprite(jsonTile.TexturePath));
+
+                    TileInfos.Add(jsonTile.ID, newTile); 
+                    
+                    Utils.ConsoleWriteWithTitle("LoadTilesInfo", $"Tile loaded: \"{newTile.Name}\" successfully.");
+
+                }catch(Newtonsoft.Json.JsonException ex)
+                {
+                    Utils.ConsoleWriteWithTitle("LoadTilesInfo ERROR", $"Error while parsing tile info file \"{Path.GetRelativePath(Settings.DataPath, tileFile.FullName)}\"\n{ex.Message}", true);
+                
+                }catch(UnauthorizedAccessException ex)
+                {
+                    Utils.ConsoleWriteWithTitle("LoadTilesInfo ERROR", $"Unauthorized access to tile info file \"{Path.GetRelativePath(Settings.DataPath, tileFile.FullName)}\"\n{ex.Message}\n", true);
+
+                }
+
+            }
+
         }
- 
+
     }
 
     public class MapTile
