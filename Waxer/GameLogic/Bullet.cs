@@ -62,7 +62,7 @@ namespace Waxer.GameLogic
                     Dispose();
                 }
                 
-            } catch(System.Collections.Generic.KeyNotFoundException)
+            } catch(NullReferenceException)
             {
                 TileUnder = null;
                 Dispose();

@@ -19,7 +19,7 @@ namespace Waxer.GameLogic
         public int Life = 300;
         private KeyboardState _oldState;
         internal Vector2 _aimVector = Vector2.Zero;
-
+ 
 
         #region DEBUG AREA
         // == DEBUG AREA ==
@@ -98,7 +98,7 @@ namespace Waxer.GameLogic
             }
 
             // Draw last delta
-            spriteBatch.DrawString(World.DebugFont, $"lr_dir: {_movePosition.ToString()}\nlr_dir_multiplied: {(_movePosition * _moveAcceleration).ToString()}\nmove_acceleration: {_moveAcceleration}\ndelta: {_lastDelta}\ndeacceleration: {_deaceleration}\n{_ceiraText}", new Vector2(12, 180), Color.Red);
+            spriteBatch.DrawString(World.DebugFont, $"lr_dir: {_movePosition.ToString()}\nmove_acceleration: {MoveSpeed * _floorSpeedAcceleration}\ndelta: {_lastDelta}\ndeacceleration: {_deaceleration}\n{_ceiraText}", new Vector2(12, 180), Color.Red);
             _ceiraText = "";
 
             // Hightlights the player position    
@@ -117,7 +117,7 @@ namespace Waxer.GameLogic
 
                 // Draw tile cordinates
                 spriteBatch.DrawString(World.DebugFont, $"X:{_tileUnderCursor.TilePosition.X}\n" + 
-                                                            $"Y:{_tileUnderCursor.TilePosition.Y}", FixedPosition, Color.Black);
+                                                        $"Y:{_tileUnderCursor.TilePosition.Y}", FixedPosition, Color.Black);
 
             }
 
@@ -145,7 +145,6 @@ namespace Waxer.GameLogic
  
             if (Utils.CheckKeyUp(_oldState, newState, Keys.F1))
             {
-                _moveAcceleration = 0;
                 EndJumping(); 
             }
 
@@ -172,7 +171,6 @@ namespace Waxer.GameLogic
             */
   
             _movePosition += MovePos;
-            if (MovePos != 0) { _moveAcceleration += (MoveSpeed - (Acceleration * _lastFriction)); }
  
             _oldState = newState;
         }
@@ -194,8 +192,6 @@ namespace Waxer.GameLogic
             }            
             
             _aimVector = -(Position - (MouseInput.PositionVector2 - World.Camera.CameraPosition));
-
-            _deaceleration = (Acceleration * Math.Max(_lastFriction, 10));
 
             UpdateInput(delta);
 

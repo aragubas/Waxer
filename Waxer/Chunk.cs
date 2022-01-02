@@ -117,13 +117,21 @@ namespace Waxer
             // Just for testing colision
             if (ChunkPosition == Vector2.Zero)
             {
-                for (int x = 4; x < 16; x++)
+                // Initial Square
+                for (int x = 4; x < 20; x++)
                 {
-                    for (int y = 20; y < 32; y++)
+                    for (int y = 5; y < 15; y++)
                     {
-                        tiles[new Vector2((ChunkPosition.X) + x, (ChunkPosition.Y) + y)].SetTileID(0);
+                        tiles[new Vector2(x, y)].SetTileID(0);
                     }
                 }
+
+                // Add some floor
+                for (int x = 4; x < 20; x++)
+                {
+                    tiles[new Vector2(x, 15)].SetTileID(2);
+                }
+
             }
 
         }

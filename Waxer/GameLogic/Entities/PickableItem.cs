@@ -79,7 +79,7 @@ namespace Waxer.GameLogic.Entities
                     if (item.GetType() == typeof(PlaceableTileItem))
                     {
                         PlaceableTileItem convertedItem = (PlaceableTileItem)item;
-                            
+
                         // A item placeable tile item has been found with the same TileID, increase quantity without creating new item on inventory
                         if (convertedItem.PlaceableTileInfo.TileID == PickItem.PlaceableTileInfo.TileID)
                         {
