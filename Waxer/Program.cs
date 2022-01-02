@@ -18,6 +18,7 @@ namespace Waxer
         {
             bool Summary = true;
 
+            // Listen for switches
             foreach(string _switch in args)
             {
                 if (_switch == "no-summary" || _switch == "--no-summary") { Summary = false; }
@@ -42,9 +43,10 @@ namespace Waxer
             if (Settings.DebugMode) 
             { 
                 Console.WriteLine("--DebugMode"); 
-                if (Settings.Debug_RenderColidersTiles) { Console.WriteLine("---DebugRenderColiderTiles"); }
-                if (Settings.Debug_RenderItemsRangeBox) { Console.WriteLine("---DebugRenderItemsRangeBox"); }
-                if (Settings.Debug_RenderPlayerPositionPoints) { Console.WriteLine("---DebugRenderPlayerPositionPoints"); }
+                if (Settings.Debug_RenderColidersTiles) { Console.WriteLine("---RenderColiderTiles"); }
+                if (Settings.Debug_RenderItemsRangeBox) { Console.WriteLine("---RenderItemsRangeBox"); }
+                if (Settings.Debug_RenderPlayerPositionPoints) { Console.WriteLine("---RenderPlayerPositionPoints"); }
+                if (Settings.Debug_RenderPlayerPositionPoints) { Console.WriteLine("---RenderChunkBorders"); }
             }
             
             Console.WriteLine("THIS RELEASE IS NOT ALLOWED FOR DISTRIBUTION NOR REVERSE ENGINNERING.");

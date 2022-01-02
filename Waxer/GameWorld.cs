@@ -65,7 +65,7 @@ namespace Waxer
             spriteBatch.Begin(transformMatrix: Camera.GetMatrix());
             int Iterations = 0;
             int chunksCount = 0;
-
+ 
             Chunk[] chunkList = new Chunk[Chunks.Count];
             Chunks.Values.CopyTo(chunkList, 0);
 
@@ -129,30 +129,33 @@ namespace Waxer
             return new Vector2(xPos, yPos);
         }
 
+        public Chunk GetChunk(Vector2 pos)
+        {
+            Vector2 chunkPosition = new Vector2((int)(pos.X * 32 / 1024), (int)(pos.Y * 32 / 1024));
 
+            if (Chunks.ContainsKey(chunkPosition))
+            {
+                return Chunks[chunkPosition];
+            }
+            
+            return null;
+        }
+ 
         public MapTile GetTile(Vector2 pos)
         { 
-            foreach(Chunk chunk in Chunks.Values)
-            {
-                if (chunk.tiles.ContainsKey(pos))
-                {
-                    return chunk.tiles[pos];
-                }
-            }
-            return null; 
+            Chunk newChunk = GetChunk(pos);
+            if (newChunk == null) { return null; }
+            
+            return newChunk.tiles[pos];
         }
-
+ 
         public bool SetTile(Vector2 pos, TileInfo newInfos)
         {
-            foreach(Chunk chunk in Chunks.Values)
-            {
-                if (chunk.tiles.ContainsKey(pos))
-                {
-                    chunk.tiles[pos].TileInformation = newInfos;
-                    return true;
-                }
-            }
-            return false; 
+            Chunk newChunk = GetChunk(pos);
+            if (newChunk == null) { return false; }
+              
+            newChunk.tiles[pos].TileInformation = newInfos;
+            return true;
         }
 
         public void Draw(SpriteBatch spriteBatch)

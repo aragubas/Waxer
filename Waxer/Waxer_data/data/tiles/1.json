@@ -1,8 +1,8 @@
 {
     "id": 1,
     "colideable": true,
-    "speedAcceleration": 1,
+    "speedAcceleration": 3,
     "name": "Dirt",
-    "breakTime": 0.15,
+    "breakTime": 0.05,
     "texturePath": "/tiles/1.png"
-}
+} 

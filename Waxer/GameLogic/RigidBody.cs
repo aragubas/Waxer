@@ -32,6 +32,7 @@ namespace Waxer.GameLogic
         internal float _deaceleration = 0;
         internal float _lastDelta = 0.0f;
         internal float _movePosition;
+        internal float _moveAccel = 0;
 
         void StopJumping()
         { 
@@ -209,8 +210,8 @@ namespace Waxer.GameLogic
         void UpdateAppliedForces(float delta)
         {
             _movePosition = Math.Clamp(_movePosition, -1, 1);
-            float ForceMultiplied = _movePosition * (MoveSpeed * _floorSpeedAcceleration);
-            
+            float ForceMultiplied = _movePosition * ((MoveSpeed * Math.Max(_moveAccel, 1)) * _floorSpeedAcceleration);
+             
             Vector2 NextStep = Position + new Vector2(ForceMultiplied * delta, 0);
             
             // Right colision

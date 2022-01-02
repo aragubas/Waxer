@@ -162,13 +162,15 @@ namespace Waxer.GameLogic
                     EndJumping();
                 }
             }
-
-            /*
+ 
             if (Utils.CheckKeyDown(_oldState, newState, Keys.LeftShift))
             {
-                _moveAcceleration += (MoveSpeed - _lastFriction) * Acceleration * delta; 
-            } 
-            */
+                _moveAccel = Acceleration; 
+            
+            }else 
+            { 
+                _moveAccel = 0;
+            }
   
             _movePosition += MovePos;
  

@@ -38,7 +38,7 @@ namespace Waxer
     public static class TilesInfo
     {
         public static Dictionary<int, TileInfo> TileInfos = new Dictionary<int, TileInfo>();
-
+ 
         #pragma warning disable 0649
         struct JsnTile
         {

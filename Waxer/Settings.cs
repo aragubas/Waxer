@@ -19,9 +19,9 @@ namespace Waxer
     {
         // Information
         public static string DevelopmentBranch = "pre-alpha";
-        public static string Version = "1.0";
+        public static string Version = "0.1";
         public static string VersionString = $"{Version}_{DevelopmentBranch}";
-
+ 
         public static float AnimationSpeed = 25f;
         public static bool DebugMode = true;
 
@@ -30,14 +30,15 @@ namespace Waxer
         public static string ImagePath = Path.Combine(ContentFolder, "img");
         public static string SoundPath = Path.Combine(ContentFolder, "sound");
         public static string DataPath = Path.Combine(ContentFolder, "data");
-        
+         
         // Debug options 
         public static bool Debug_RenderColidersTiles = true;
         public static bool Debug_RenderPlayerPositionPoints = true;
         public static bool Debug_RenderItemsRangeBox = true;
+        public static bool Debug_DrawChunkBorders = true;
         
         //Physics
-        public static float StableDelta = 0.017f;
+        public static float StableDelta = 0.016f;
         public static float MaximumMoveSpeed = 1024;
 
     }
